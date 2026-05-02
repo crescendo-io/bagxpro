@@ -32,7 +32,7 @@ function bagxpro_register_produit_post_type() {
 			'show_ui'             => true,
 			'show_in_menu'        => true,
 			'query_var'           => true,
-			'has_archive'         => true,
+			'has_archive'         => 'produits',
 			'rewrite'             => array( 'slug' => 'produit' ),
 			'capability_type'     => 'post',
 			'menu_icon'           => 'dashicons-cart',
