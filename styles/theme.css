@@ -16,6 +16,9 @@ p,
     }
 }
 
+body{
+    background: #F1F1F1;
+}
 .swiper-button-next, .swiper-button-prev{
     color: #fff;
     background: #1C2056;
@@ -73,8 +76,8 @@ ul li{
 }
 
 h1, .style-H1{
-    font-size: 60px;
-    line-height: 60px;
+    font-size: clamp(22px, 3vw,  70px);
+    line-height: 3vw;
     font-weight: 800;
     margin-bottom: 15px;
 }
@@ -89,15 +92,14 @@ h1, .style-H1{
 h2, .style-H2{
     font-size: 50px;
     line-height: 53px;
-    font-weight: 800;
-    color: #1C2056;
+    font-weight: 500;
+    color: #000;
     margin-bottom: 15px;
 }
 h3, .style-H3{
-    font-size: 40px;
-    line-height: 43px;
-    font-weight: 800;
-    color: #AE6532;
+    font-size: 30px;
+    line-height: 35px;
+    color: #000;
     margin-bottom: 15px;
 }
 h4, .style-H4{
@@ -161,15 +163,14 @@ p{
 .button{
     background: #FFF;
     display: inline-block;
-    padding: 15px 35px;
-    border-radius: 5px;
-    font-size: 16px;
-    font-weight: 700;
+    padding: 15px 20px;
+    font-size: 14px;
+    font-weight: 600;
     color: #AE6532;
     transition: .3s;
 
     &.primary{
-        background: #AE6532;
+        background: #EAB933;
         color: #FFF;
 
         &:hover{
@@ -188,7 +189,7 @@ p{
 .sentence-header{
     position: absolute;
     width: 100%;
-    background: #1C2056;
+    background: #EAB933;
     color: #FFF;
     z-index: 8;
     padding: 8px;
@@ -198,25 +199,20 @@ p{
 }
 
 header.linear{
-    background: #FFF;
     border-radius: 10px;
-    max-width: 1920px;
-    top: 70px;
-    left: 50%;
-    transform: translateX(-50%);
+
+    top: 36px;
     position: absolute;
     padding: 20px;
-    width: calc(100% - 60px);
 }
 
 header.burger.is-scrolled{
     width: 100%;
     border-radius: 0 0 15px 15px;
-    transform: translateY(-100%) translateX(-50%);
+    transform: translateY(-100%) translateX(-0%);
     background-color: #faf8f5;
 }
 header.burger.is-scrolled.is-visible {
-    transform: translateY(0%) translateX(-50%);
     transition: 0.6s transform;
 }
 
@@ -224,17 +220,25 @@ header.linear ul{
     padding-top: 12px;
 }
 header.linear ul li a{
-    font-weight: 600;
+    font-weight: 500;
     font-size: 14px;
+    text-transform: uppercase;
 }
 header.burger .logo, header.burger .logo-scroll{
-    margin-top: 0;
-    width: 130px;
+    margin-top: 5px;
+    width: 170px;
 }
+
+header.burger{
+    border-bottom: 1px solid #ccc;
+}
+
 
 /* FOOTER */
 footer{
     padding: 65px;
+    background: #FFF;
+    margin-top: 80px;
     .logo-footer{
         width: 180px;
     }
@@ -275,18 +279,15 @@ footer{
 .strate-hero .strate-hero_inner{
     color: #FFF;
     position: relative;
-    left: 20%;
+    left: 15%;
     transform: translateX(-0%) translateY(0) !important;
     top: auto;
     padding-top: 300px;
     padding-bottom: 150px;
     z-index: 6;
-    max-width: 900px;
     width: 100%;
     text-align: left;
-    p,h1{
-        max-width: 900px;
-    }
+
 }
 
 .strate-hero.dark:before{
@@ -700,4 +701,224 @@ button{
 
 .formulaire-footer.white .impactexpo-lead-form .impactexpo-label{
     color: #1C2056;
+}
+
+
+.container-bag-home{
+    position: absolute;
+    width: 33%;
+    z-index: 30;
+    top: 60%;
+    transform: translateY(-50%);
+    right: 10%;
+}
+.container-bag-home .bag-img{
+    width: 100%;
+}
+
+.placeholder{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
+
+.strate-hero .strate-hero_inner{
+    width: 50%;
+    left: 10%;
+    top: 50%;
+    transform: translateY(-50%) !important;
+    padding-top: 0;
+    padding-bottom: 0;
+    color: #000;
+}
+
+.strate-hero{
+    border-radius: 0;
+}
+
+.strate-hero.home:after{
+    content: '';
+    position: absolute;
+    background: #EAB933; /* orange */
+    height: 300px;
+    width: 100%;
+    bottom: 0;
+    clip-path: polygon(0 90%, 100% 0%, 100% 100%, 0% 100%);
+}
+
+.list-logo{
+    background: #EAB933;
+    border-top: 1px solid #F3D78B;
+}
+
+.list-logo ul{
+    display: flex;
+    padding: 0 30px;
+    align-items: center;
+}
+
+.list-logo ul li{
+    flex: 1; /* chaque élément prend une part égale */
+    text-align: center;
+    padding: 30px 3vw;
+
+}
+
+.list-logo ul li img{
+    max-width: 250px;
+    width: 100%;
+}
+
+.list-logo .label{
+    text-align: left;
+    color: #FFF;
+    font-size: clamp(16px, .9vw, 25px);
+    line-height: 1;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+.section-cards{
+    margin-top: 50px;
+    .card-border{
+        width: 100%;
+        border-top: 5px solid #EAB933;
+        padding: 40px;
+        background: #FFF;
+        height: 45vh;
+        display: flex;
+        flex-direction: column;
+
+        .card-number{
+            font-size: clamp(22px, 3.2vw, 75px);
+            line-height: 1;
+        }
+
+        .card-label{
+            font-size: clamp(16px, 1.2vw, 22px);
+        }
+
+        .card-description{
+            font-size: clamp(16px, 1vw, 20px);
+            text-transform: uppercase;
+            line-height: 1.3;
+            color: #6C6C6C;
+            margin-top: auto;
+        }
+    }
+}
+
+.container-image-cards-placeholder{
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+
+    .img-card{
+        object-fit: cover;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+    }
+}
+
+
+.strate-presentation{
+    padding: 40px 0;
+    .container-white{
+        background: #FFF;
+        padding: 80px;
+    }
+
+    img{
+        width: 100%;
+    }
+
+    .row{
+        align-items: center;
+    }
+    ul{
+        padding-top: 20px;
+        counter-reset: card;
+
+        li{
+            border-top: 1px solid #F7F7F7;
+            padding: 30px 0;
+            counter-increment: card;
+            p{
+                padding-left: 45px;
+            }
+
+            h3{
+                margin-bottom: 10px;
+                position: relative;
+                padding-left: 45px;
+                line-height: 1;
+                &:before{
+                    content: "0" counter(card) "/";
+                    font-size: 18px;
+                    font-weight: 500;
+                    vertical-align: top;
+                    color: #EAB933;
+                    left: 0;
+                    position: absolute;
+                }
+            }
+        }
+    }
+}
+
+
+
+.card-product{
+    border-bottom: 5px solid #EAB933;
+    margin-top: 30px;
+    .img-product{
+        width: 100%;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        height: 18vw;
+        justify-content: flex-end;
+        img{
+            max-width: 90%;
+            max-height: 100%;
+            height: auto;
+            object-fit: contain;
+            display: block;
+            position: relative;
+            z-index: 30;
+            margin: 0 auto;
+        }
+
+        &:before{
+            content: "";
+            width: 100%;
+            height: 20vh;
+            background: #FFF;
+            position: absolute;
+            bottom: 0;
+            border-radius: 60px 0 0 0;
+        }
+    }
+    .description-product{
+        background: #FFF;
+        padding: 20px 40px 40px;
+
+
+        .button{
+            margin-top: 10px;
+        }
+    }
+}
+
+.card-intro-product{
+    background: #FFF;
+    height: 100%;
+    border-radius: 60px 0 0 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* centre verticalement */
+    padding: 80px;
 }
