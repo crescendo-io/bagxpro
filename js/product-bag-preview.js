@@ -1,22 +1,97 @@
 (function () {
 	'use strict';
 
+	var FADE_MS = 450;
+
 	function initStraps(root) {
 		var group = root.querySelector('[data-bagxpro-straps]');
-		if (!group) {
+		var stack = root.querySelector('[data-bagxpro-bag-stack]');
+		if (!group || !stack) {
 			return;
 		}
 
-		var swatches = group.querySelectorAll('.bagxpro-swatch');
-		for (var i = 0; i < swatches.length; i++) {
-			swatches[i].addEventListener('click', function () {
+		var busy = false;
+
+		function activateLayer(index) {
+			var incoming = stack.querySelector('.bagxpro-bag-layer[data-layer-index="' + index + '"]');
+			if (!incoming) {
+				return;
+			}
+
+			var outgoing = stack.querySelector('.bagxpro-bag-layer.is-visible');
+			if (!outgoing || incoming === outgoing) {
+				return;
+			}
+
+			if (busy) {
+				return;
+			}
+			busy = true;
+			stack.setAttribute('data-bagxpro-stack-busy', '');
+
+			function cleanup() {
+				busy = false;
+				stack.removeAttribute('data-bagxpro-stack-busy');
+			}
+
+			incoming.classList.add('is-fading-in');
+
+			function onEnd(ev) {
+				if (ev.target !== incoming || ev.propertyName !== 'opacity') {
+					return;
+				}
+				incoming.removeEventListener('transitionend', onEnd);
+				outgoing.classList.remove('is-visible');
+				incoming.classList.remove('is-fading-in', 'is-fading-in--show');
+				incoming.classList.add('is-visible');
+				cleanup();
+			}
+
+			incoming.addEventListener('transitionend', onEnd);
+
+			requestAnimationFrame(function () {
+				requestAnimationFrame(function () {
+					incoming.classList.add('is-fading-in--show');
+				});
+			});
+
+			window.setTimeout(function () {
+				if (!busy) {
+					return;
+				}
+				if (incoming.classList.contains('is-fading-in')) {
+					incoming.removeEventListener('transitionend', onEnd);
+					outgoing.classList.remove('is-visible');
+					incoming.classList.remove('is-fading-in', 'is-fading-in--show');
+					incoming.classList.add('is-visible');
+					cleanup();
+				}
+			}, FADE_MS + 120);
+		}
+
+		var swatches = group.querySelectorAll('.bagxpro-swatch[data-layer-index]');
+		for (var s = 0; s < swatches.length; s++) {
+			swatches[s].addEventListener('click', function () {
 				var btn = this;
+				if (stack.getAttribute('data-bagxpro-stack-busy') !== null) {
+					return;
+				}
+				if (btn.classList.contains('is-selected')) {
+					return;
+				}
+				var idx = btn.getAttribute('data-layer-index');
+				if (idx === null || idx === '') {
+					return;
+				}
+
 				for (var j = 0; j < swatches.length; j++) {
 					swatches[j].classList.remove('is-selected');
 					swatches[j].setAttribute('aria-pressed', 'false');
 				}
 				btn.classList.add('is-selected');
 				btn.setAttribute('aria-pressed', 'true');
+
+				activateLayer(idx);
 			});
 		}
 	}
@@ -116,7 +191,7 @@
 				try {
 					input.files = dt.files;
 				} catch (err) {
-					/* assignation files impossible sur certains navigateurs */
+					/* noop */
 				}
 			});
 		}

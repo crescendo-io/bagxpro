@@ -22,7 +22,42 @@ while ( have_posts() ) :
 			}
 		}
 	}
+
+	$product_color_rows = array();
+	$couleurs_acf        = function_exists( 'get_field' ) ? get_field( 'product_colors' ) : null;
+	if ( ! empty( $couleurs_acf ) && is_array( $couleurs_acf ) ) {
+		foreach ( $couleurs_acf as $row ) {
+			$hex         = isset( $row['product_color'] ) ? $row['product_color'] : '';
+			$image_field = isset( $row['product_color_image'] ) ? $row['product_color_image'] : '';
+			$image_url   = '';
+			if ( is_array( $image_field ) && ! empty( $image_field['url'] ) ) {
+				$image_url = $image_field['url'];
+			} elseif ( is_numeric( $image_field ) ) {
+				$image_url = wp_get_attachment_image_url( (int) $image_field, 'large' );
+			} elseif ( is_string( $image_field ) && filter_var( $image_field, FILTER_VALIDATE_URL ) ) {
+				$image_url = $image_field;
+			}
+			if ( ! $image_url ) {
+				$image_url = $bag_src;
+			}
+			$product_color_rows[] = array(
+				'hex'   => $hex,
+				'url'   => $image_url,
+				'label' => isset( $row['product_color_label'] ) ? $row['product_color_label'] : '',
+			);
+		}
+	}
+
+	$bag_layers = array();
+	if ( ! empty( $product_color_rows ) ) {
+		foreach ( $product_color_rows as $row ) {
+			$bag_layers[] = $row['url'];
+		}
+	} else {
+		$bag_layers[] = $bag_src;
+	}
 	?>
+
 
 <main class="bagxpro-single-produit" id="bagxpro-produit-<?php echo (int) get_the_ID(); ?>" data-bagxpro-product-page>
 	<div class="container">
@@ -31,13 +66,34 @@ while ( have_posts() ) :
 				<div class="bagxpro-preview-column">
 					<div class="bagxpro-bag-preview-container">
 						<div class="bagxpro-bag-preview" id="bagxpro-bag-preview">
-							<img
-								class="bagxpro-bag-preview__bag"
-								src="<?php echo esc_url( $bag_src ); ?>"
-								alt="<?php echo esc_attr( $bag_alt ); ?>"
-								loading="eager"
-								decoding="async"
-							>
+							<div class="bagxpro-bag-preview__stack" data-bagxpro-bag-stack>
+								<img
+									class="bagxpro-bag-preview__size-ref"
+									src="<?php echo esc_url( $bag_layers[0] ); ?>"
+									alt=""
+									loading="eager"
+									decoding="async"
+									draggable="false"
+									aria-hidden="true"
+								>
+								<?php
+								foreach ( $bag_layers as $layer_i => $layer_url ) :
+									$is_first_layer = ( 0 === (int) $layer_i );
+									?>
+								<img
+									class="bagxpro-bag-layer<?php echo $is_first_layer ? ' is-visible' : ''; ?>"
+									src="<?php echo esc_url( $layer_url ); ?>"
+									alt="<?php echo esc_attr( $bag_alt ); ?>"
+									data-layer-index="<?php echo (int) $layer_i; ?>"
+									loading="eager"
+									decoding="async"
+									fetchpriority="<?php echo $is_first_layer ? 'high' : 'low'; ?>"
+									draggable="false"
+								>
+									<?php
+								endforeach;
+								?>
+							</div>
 							<div class="bagxpro-bag-preview__logo" id="bagxpro-bag-logo" aria-hidden="true" hidden></div>
 						</div>
 					</div>
@@ -81,10 +137,28 @@ while ( have_posts() ) :
 					<div class="bagxpro-field bagxpro-field--straps" data-bagxpro-straps>
 						<span class="bagxpro-field__label" id="bagxpro-straps-label"><?php esc_html_e( 'Couleur des sangles', 'bagxpro' ); ?></span>
 						<div class="bagxpro-swatches" role="radiogroup" aria-labelledby="bagxpro-straps-label">
-							<button type="button" class="bagxpro-swatch bagxpro-swatch--black is-selected" data-strap="black" aria-pressed="true" aria-label="<?php esc_attr_e( 'Noir', 'bagxpro' ); ?>"></button>
-							<button type="button" class="bagxpro-swatch bagxpro-swatch--blue" data-strap="blue" aria-pressed="false" aria-label="<?php esc_attr_e( 'Bleu', 'bagxpro' ); ?>"></button>
-							<button type="button" class="bagxpro-swatch bagxpro-swatch--red" data-strap="red" aria-pressed="false" aria-label="<?php esc_attr_e( 'Rouge', 'bagxpro' ); ?>"></button>
-							<button type="button" class="bagxpro-swatch bagxpro-swatch--green" data-strap="green" aria-pressed="false" aria-label="<?php esc_attr_e( 'Vert', 'bagxpro' ); ?>"></button>
+						<?php
+						if ( ! empty( $product_color_rows ) ) :
+							foreach ( $product_color_rows as $idx => $crow ) {
+								$hex            = isset( $crow['hex'] ) ? $crow['hex'] : '';
+								$label          = ! empty( $crow['label'] ) ? $crow['label'] : sprintf( /* translators: %d: index */ __( 'Couleur %d', 'bagxpro' ), $idx + 1 );
+								$is_first       = ( 0 === $idx );
+								$selected_class = $is_first ? ' is-selected' : '';
+								$aria_pressed   = $is_first ? 'true' : 'false';
+								$style_bg       = $hex ? 'background-color:' . esc_attr( $hex ) . ';' : '';
+								?>
+								<button
+									type="button"
+									class="bagxpro-swatch<?php echo esc_attr( $selected_class ); ?>"
+									style="<?php echo esc_attr( $style_bg ); ?>"
+									data-layer-index="<?php echo (int) $idx; ?>"
+									aria-pressed="<?php echo esc_attr( $aria_pressed ); ?>"
+									aria-label="<?php echo esc_attr( $label ); ?>"
+								></button>
+								<?php
+							}
+						endif;
+						?>
 						</div>
 					</div>
 

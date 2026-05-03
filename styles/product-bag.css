@@ -63,10 +63,53 @@
 	width: 100%;
 }
 
-.bagxpro-bag-preview__bag {
+/* Empilement : toutes les images chargées dans le DOM, superposées (z-index) */
+.bagxpro-bag-preview__stack {
+	position: relative;
+	display: block;
+	width: 100%;
+}
+
+/* Référence de cadrage : occupe le flux, invisible mais garde le ratio */
+.bagxpro-bag-preview__size-ref {
 	display: block;
 	width: 100%;
 	height: auto;
+	visibility: hidden;
+	pointer-events: none;
+}
+
+.bagxpro-bag-layer {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: auto;
+	display: block;
+	object-fit: contain;
+	object-position: center top;
+	opacity: 0;
+	pointer-events: none;
+	transition: none;
+	z-index: 1;
+}
+
+/* Image affichée au repos : pas de transition (l’ancien reste net jusqu’à la fin du fondu du nouveau) */
+.bagxpro-bag-layer.is-visible {
+	opacity: 1;
+	z-index: 2;
+}
+
+/* Nouveau visuel au-dessus : part de transparent, seul ce calque est animé */
+.bagxpro-bag-layer.is-fading-in {
+	opacity: 0;
+	z-index: 5;
+	transition: opacity 0.45s ease;
+	will-change: opacity;
+}
+
+.bagxpro-bag-layer.is-fading-in.is-fading-in--show {
+	opacity: 1;
 }
 
 .bagxpro-bag-preview__accent-line {
@@ -401,7 +444,7 @@
 	transform: translateY(1px);
 }
 
-/* Logo sur le sac */
+/* Logo sur le sac (au-dessus des calques) */
 .bagxpro-bag-preview__logo {
 	position: absolute;
 	left: 50%;
@@ -415,6 +458,7 @@
 	justify-content: center;
 	box-sizing: border-box;
 	padding: 4%;
+	z-index: 5;
 }
 
 .bagxpro-bag-preview__logo[hidden] {
