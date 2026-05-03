@@ -964,3 +964,9 @@ button{
         margin-bottom: 10px;
     }
 }
+
+/* SINGLE PRODUIT */
+.bagxpro-single-produit{
+    padding-top: 100px;
+    padding-bottom: 100px;
+}

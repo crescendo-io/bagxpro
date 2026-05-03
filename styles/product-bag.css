@@ -1,37 +1,407 @@
-/* Fiche produit big bag — aperçu + panneau */
+/* Fiche produit — simulateur (maquette Bag X Pro) */
+
+:root {
+	--bagxpro-sim-gold: #eab933;
+	--bagxpro-sim-gold-hover: #d9a82a;
+	--bagxpro-sim-bg: #f2f2f2;
+	--bagxpro-sim-text: #000;
+	--bagxpro-sim-muted: #6b6b6b;
+	--bagxpro-sim-line: #d0d0d0;
+	/* Offset sous le header fixe — ajuster si besoin */
+	--bagxpro-sticky-top: 100px;
+}
 
 .bagxpro-single-produit {
-	padding: 2rem 0 4rem;
+	padding: 220px 0 64px;
+	background: var(--bagxpro-sim-bg);
+	min-height: 60vh;
 }
 
 .bagxpro-single-produit__breadcrumb {
 	margin-bottom: 1.5rem;
-	margin-top: 180px;
+	margin-top: 0;
 }
 
 .bagxpro-single-produit__row {
-	align-items: flex-start;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: stretch;
+	gap: 2rem 0;
+}
+
+/* Colonne gauche : même hauteur que le formulaire pour le sticky */
+.bagxpro-preview-col {
+	display: flex;
+	flex-direction: column;
+}
+
+/* Colonne visuel (sticky desktop : reste visible tant qu’on fait défiler le formulaire) */
+.bagxpro-preview-column {
+	width: 100%;
+	/*max-width: 640px;*/
+	margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+	.bagxpro-preview-column {
+		position: sticky;
+		top: 20px;
+		align-self: flex-start;
+	}
+}
+
+.bagxpro-bag-preview-container {
+	background: #fff;
+	border-radius: 60px 0 0 0;
+	overflow: hidden;
+	box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
 }
 
 .bagxpro-bag-preview {
 	position: relative;
 	display: block;
 	width: 100%;
-	max-width: 640px;
-	margin: 0 auto;
-	background: #fff;
-	border-radius: 4px;
-	overflow: hidden;
 }
 
 .bagxpro-bag-preview__bag {
 	display: block;
 	width: 100%;
 	height: auto;
-	vertical-align: middle;
 }
 
-/* Zone logo : panneau central du sac (ajuster si autre photo) */
+.bagxpro-bag-preview__accent-line {
+	height: 4px;
+	width: 100%;
+	background: var(--bagxpro-sim-gold);
+	margin: 0;
+}
+
+.bagxpro-bag-preview__legal {
+	margin: 12px 0 0;
+	font-size: 11px;
+	letter-spacing: 0.02em;
+	color: var(--bagxpro-sim-muted);
+	text-align: left;
+	line-height: 1.4;
+}
+
+/* Zone logo */
+.bagxpro-logo-zone {
+	position: relative;
+	margin-bottom: 32px;
+	min-height: 180px;
+	border: 2px dashed var(--bagxpro-sim-gold);
+	border-radius: 8px;
+	background: rgba(255, 255, 255, 0.6);
+	transition: background 0.2s, border-color 0.2s;
+}
+
+.bagxpro-logo-zone.is-dragover {
+	background: rgba(234, 185, 51, 0.12);
+	border-color: var(--bagxpro-sim-gold-hover);
+}
+
+.bagxpro-logo-zone.has-logo {
+	border-style: solid;
+	border-color: rgba(234, 185, 51, 0.65);
+	background: rgba(255, 255, 255, 0.85);
+}
+
+.bagxpro-logo-zone__input {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	cursor: pointer;
+	z-index: 2;
+	font-size: 0;
+}
+
+.bagxpro-logo-zone__visual {
+	position: relative;
+	z-index: 1;
+	pointer-events: none;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 28px 20px 32px;
+	min-height: 180px;
+	text-align: center;
+}
+
+.bagxpro-logo-zone__title {
+	margin: 0 0 8px;
+	font-size: 15px;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--bagxpro-sim-text);
+}
+
+.bagxpro-logo-zone__hint {
+	margin: 0 0 20px;
+	font-size: 14px;
+	color: var(--bagxpro-sim-muted);
+}
+
+.bagxpro-logo-zone__cta {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	padding: 12px 28px;
+	border-radius: 4px;
+	background: var(--bagxpro-sim-gold);
+	color: #fff;
+	font-size: 13px;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	box-shadow: 0 2px 8px rgba(234, 185, 51, 0.35);
+}
+
+.bagxpro-logo-zone__cta-icon {
+	flex-shrink: 0;
+	color: #fff;
+}
+
+.bagxpro-logo-clear {
+	display: inline-block;
+	margin: -16px 0 24px;
+	padding: 0;
+	border: 0;
+	background: none;
+	color: var(--bagxpro-sim-muted);
+	font-size: 14px;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.bagxpro-logo-clear:hover {
+	color: var(--bagxpro-sim-text);
+}
+
+.bagxpro-logo-clear[hidden] {
+	display: none;
+}
+
+/* Zone logo superposée au clic : file input reste au-dessus */
+
+/* Panneau droit */
+.bagxpro-produit-panel {
+	padding-top: 8px;
+	max-width: 100%;
+	margin-left: 0;
+	padding-bottom: 60px;
+	margin-right: auto;
+}
+
+.bagxpro-produit-panel__header {
+	margin-bottom: 28px;
+}
+
+.bagxpro-produit-panel__title {
+	margin: 0 0 10px;
+	font-size: clamp(1.75rem, 3.5vw, 2.25rem);
+	font-weight: 700;
+	line-height: 1.15;
+	color: var(--bagxpro-sim-text);
+}
+
+.bagxpro-produit-panel__specs {
+	margin: 0;
+	font-size: 14px;
+	font-weight: 500;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--bagxpro-sim-muted);
+	line-height: 1.4;
+}
+
+/* Pastilles sangles */
+.bagxpro-field {
+	margin-bottom: 12px;
+}
+
+.bagxpro-field--straps .bagxpro-field__label {
+	display: block;
+	margin-bottom: 14px;
+	font-weight: 600;
+	font-size: 15px;
+	color: var(--bagxpro-sim-text);
+}
+
+.bagxpro-swatches {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 14px;
+	align-items: center;
+}
+
+.bagxpro-swatch {
+	width: 40px;
+	height: 40px;
+	padding: 0;
+	border: 2px solid transparent;
+	border-radius: 50%;
+	cursor: pointer;
+	box-sizing: border-box;
+	transition: box-shadow 0.2s, transform 0.15s;
+}
+
+.bagxpro-swatch:hover {
+	transform: scale(1.05);
+}
+
+.bagxpro-swatch.is-selected {
+	border-color: #9ca3af;
+	box-shadow: 0 0 0 1px #fff inset;
+}
+
+.bagxpro-swatch--black {
+	background: #1a1a1a;
+}
+
+.bagxpro-swatch--blue {
+	background: #2563eb;
+}
+
+.bagxpro-swatch--red {
+	background: #dc2626;
+}
+
+.bagxpro-swatch--green {
+	background: #16a34a;
+}
+
+/* Select quantité */
+.bagxpro-field--quantity .bagxpro-field__label {
+	display: block;
+	margin-bottom: 10px;
+	font-weight: 600;
+	font-size: 15px;
+	color: var(--bagxpro-sim-text);
+}
+
+.bagxpro-select-wrap {
+	position: relative;
+}
+
+.bagxpro-select-wrap::after {
+	content: "";
+	position: absolute;
+	right: 16px;
+	top: 50%;
+	width: 0;
+	height: 0;
+	margin-top: -3px;
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+	border-top: 6px solid #1a1a1a;
+	pointer-events: none;
+}
+
+.bagxpro-select {
+	appearance: none;
+	width: 100%;
+	padding: 14px 44px 14px 16px;
+	font-family: inherit;
+	font-size: 15px;
+	line-height: 1.35;
+	color: var(--bagxpro-sim-text);
+	background: #fff;
+	border: 1px solid var(--bagxpro-sim-line);
+	border-radius: 6px;
+	cursor: pointer;
+	transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.bagxpro-select:focus {
+	outline: none;
+	border-color: var(--bagxpro-sim-gold);
+	box-shadow: 0 0 0 3px rgba(234, 185, 51, 0.25);
+}
+
+/* Contact (nom, prénom, e-mail, téléphone) */
+.bagxpro-produit-panel__contact {
+	margin-top: 8px;
+	margin-bottom: 24px;
+}
+
+.bagxpro-produit-panel__contact .bagxpro-field {
+	margin-bottom: 20px;
+}
+
+.bagxpro-produit-panel__contact .bagxpro-field:last-child {
+	margin-bottom: 0;
+}
+
+.bagxpro-produit-panel__contact .bagxpro-field__label {
+	display: block;
+	margin-bottom: 10px;
+	font-weight: 600;
+	font-size: 15px;
+	color: var(--bagxpro-sim-text);
+}
+
+.bagxpro-input {
+	display: block;
+	box-sizing: border-box;
+	width: 100%;
+	padding: 14px 16px;
+	font-family: inherit;
+	font-size: 15px;
+	line-height: 1.35;
+	color: var(--bagxpro-sim-text);
+	background: #fff;
+	border: 1px solid var(--bagxpro-sim-line);
+	border-radius: 6px;
+	transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.bagxpro-input::placeholder {
+	color: #9ca3af;
+}
+
+.bagxpro-input:focus {
+	outline: none;
+	border-color: var(--bagxpro-sim-gold);
+	box-shadow: 0 0 0 3px rgba(234, 185, 51, 0.25);
+}
+
+/* Prix dans les options : accent partiel impossible en natif — chaîne unique */
+
+.bagxpro-btn-order {
+	display: block;
+	width: 100%;
+	margin-top: 0;
+	margin-bottom: 0;
+	padding: 18px 24px;
+	border: none;
+	border-radius: 6px;
+	background: var(--bagxpro-sim-gold);
+	color: #fff;
+	font-family: inherit;
+	font-size: 15px;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	cursor: pointer;
+	box-shadow: 0 4px 14px rgba(234, 185, 51, 0.4);
+	transition: background 0.2s, transform 0.15s;
+}
+
+.bagxpro-btn-order:hover {
+	background: var(--bagxpro-sim-gold-hover);
+}
+
+.bagxpro-btn-order:active {
+	transform: translateY(1px);
+}
+
+/* Logo sur le sac */
 .bagxpro-bag-preview__logo {
 	position: absolute;
 	left: 50%;
@@ -57,83 +427,29 @@
 	width: auto;
 	height: auto;
 	object-fit: contain;
-	/* encre / impression sur polypropylène blanc : fondu dans le blanc du sac */
 	mix-blend-mode: multiply;
 	opacity: 0.78;
 	filter: contrast(0.88) brightness(1.14) saturate(0.92);
 }
 
-.bagxpro-produit-panel__title {
-	margin-top: 0;
-	margin-bottom: 0.75rem;
-}
-
-.bagxpro-produit-panel__excerpt {
-	margin-bottom: 1.5rem;
-	opacity: 0.9;
-}
-
-.bagxpro-produit-panel__fields {
-	margin-bottom: 2rem;
-}
-
-.bagxpro-field {
-	margin-bottom: 1.5rem;
-}
-
-.bagxpro-field__label {
-	display: block;
-	font-weight: 600;
-	margin-bottom: 0.35rem;
-}
-
-.bagxpro-field__input--number {
-	max-width: 8rem;
-	padding: 0.5rem 0.65rem;
-	border: 1px solid #ccc;
-	border-radius: 4px;
-}
-
-.bagxpro-field__input--file {
-	display: block;
-	width: 100%;
-	max-width: 100%;
-}
-
-.bagxpro-field__hint {
-	font-size: 0.875rem;
-	margin: 0.5rem 0 0;
-	opacity: 0.85;
-	line-height: 1.4;
-}
-
-.bagxpro-btn {
-	display: inline-block;
-	margin-top: 0.75rem;
-	padding: 0.45rem 1rem;
-	border-radius: 4px;
-	cursor: pointer;
-	font-size: 0.9rem;
-	border: 1px solid #333;
-	background: #333;
-	color: #fff;
-}
-
-.bagxpro-btn--ghost {
-	background: transparent;
-	color: #333;
-}
-
-.bagxpro-btn--ghost:hover {
-	background: rgba(0, 0, 0, 0.06);
-}
-
-.bagxpro-btn[hidden] {
-	display: none;
-}
-
 .bagxpro-produit-panel__content {
-	margin-top: 1.5rem;
-	padding-top: 1.5rem;
-	border-top: 1px solid #e5e5e5;
+	margin-top: 40px;
+	padding-top: 32px;
+	border-top: 1px solid var(--bagxpro-sim-line);
+	font-size: 15px;
+	line-height: 1.6;
+}
+
+@media (max-width: 767px) {
+	.bagxpro-single-produit {
+		padding: 120px 0 48px;
+	}
+
+	.bagxpro-preview-column {
+		position: static;
+	}
+
+	.bagxpro-produit-panel {
+		max-width: none;
+	}
 }
