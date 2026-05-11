@@ -3,11 +3,32 @@
 
 	var FADE_MS = 450;
 
+	function syncStrapFields(root, btn) {
+		if (!btn) {
+			return;
+		}
+		var idx = btn.getAttribute('data-layer-index');
+		var lbl = btn.getAttribute('data-strap-label') || '';
+		var idxInput = root.querySelector('#bagxpro-strap-index');
+		var lblInput = root.querySelector('#bagxpro-strap-label');
+		if (idxInput && idx !== null && idx !== '') {
+			idxInput.value = idx;
+		}
+		if (lblInput) {
+			lblInput.value = lbl;
+		}
+	}
+
 	function initStraps(root) {
 		var group = root.querySelector('[data-bagxpro-straps]');
 		var stack = root.querySelector('[data-bagxpro-bag-stack]');
 		if (!group || !stack) {
 			return;
+		}
+
+		var selectedSwatch = group.querySelector('.bagxpro-swatch.is-selected');
+		if (selectedSwatch) {
+			syncStrapFields(root, selectedSwatch);
 		}
 
 		var busy = false;
@@ -91,6 +112,7 @@
 				btn.classList.add('is-selected');
 				btn.setAttribute('aria-pressed', 'true');
 
+				syncStrapFields(root, btn);
 				activateLayer(idx);
 			});
 		}
@@ -197,12 +219,78 @@
 		}
 	}
 
+	/**
+	 * Capture .bagxpro-bag-preview (html2canvas) en JPEG puis soumission réelle sans reboucler sur submit.
+	 */
+	function initPreviewMailCapture(root) {
+		var form = root.querySelector('.bagxpro-produit-form');
+		var preview = root.querySelector('#bagxpro-bag-preview') || root.querySelector('.bagxpro-bag-preview');
+		var captureInput = root.querySelector('#bagxpro-preview-capture');
+		if (!form || !preview || !captureInput) {
+			return;
+		}
+		if (typeof html2canvas !== 'function') {
+			return;
+		}
+
+		form.addEventListener('submit', function (e) {
+			e.preventDefault();
+
+			var submitBtn = form.querySelector('button[type="submit"]');
+			if (submitBtn) {
+				submitBtn.disabled = true;
+			}
+
+			function sendForm() {
+				if (typeof HTMLFormElement !== 'undefined' && HTMLFormElement.prototype.submit) {
+					HTMLFormElement.prototype.submit.call(form);
+				} else {
+					form.submit();
+				}
+			}
+
+			html2canvas(preview, {
+				scale: window.devicePixelRatio > 1 ? 1.5 : 1,
+				useCORS: true,
+				allowTaint: false,
+				backgroundColor: null,
+				logging: false,
+			})
+				.then(function (canvas) {
+					if (!canvas) {
+						sendForm();
+						return;
+					}
+					canvas.toBlob(
+						function (blob) {
+							if (blob && blob.size > 0 && window.DataTransfer && typeof File !== 'undefined') {
+								try {
+									var dt = new DataTransfer();
+									dt.items.add(new File([blob], 'apercu-configurateur.jpg', { type: 'image/jpeg' }));
+									captureInput.files = dt.files;
+								} catch (err) {
+									/* noop */
+								}
+							}
+							sendForm();
+						},
+						'image/jpeg',
+						0.88
+					);
+				})
+				.catch(function () {
+					sendForm();
+				});
+		});
+	}
+
 	function init(root) {
 		if (!root) {
 			return;
 		}
 		initLogo(root);
 		initStraps(root);
+		initPreviewMailCapture(root);
 	}
 
 	document.addEventListener('DOMContentLoaded', function () {

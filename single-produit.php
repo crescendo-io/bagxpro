@@ -56,6 +56,13 @@ while ( have_posts() ) :
 	} else {
 		$bag_layers[] = $bag_src;
 	}
+
+	$first_strap_label = '';
+	if ( ! empty( $product_color_rows[0] ) ) {
+		$first_strap_label = ! empty( $product_color_rows[0]['label'] )
+			? $product_color_rows[0]['label']
+			: sprintf( /* translators: %d: index */ __( 'Couleur %d', 'bagxpro' ), 1 );
+	}
 	?>
 
 
@@ -103,12 +110,61 @@ while ( have_posts() ) :
 			</div>
 			<div class="col-sm-5 mx-auto">
 				<div class="bagxpro-produit-panel">
+					<?php if ( isset( $_GET['commande'] ) && 'merci' === sanitize_text_field( wp_unslash( $_GET['commande'] ) ) ) : ?>
+						<div class="bagxpro-notice bagxpro-notice--success" role="status">
+							<?php esc_html_e( 'Merci : votre demande a bien été envoyée.', 'bagxpro' ); ?>
+						</div>
+					<?php elseif ( isset( $_GET['commande'] ) && 'incomplet' === sanitize_text_field( wp_unslash( $_GET['commande'] ) ) ) : ?>
+						<div class="bagxpro-notice bagxpro-notice--error" role="alert">
+							<?php esc_html_e( 'Merci de renseigner le nom, le prénom et une adresse e-mail valide.', 'bagxpro' ); ?>
+						</div>
+					<?php elseif ( isset( $_GET['commande'] ) && 'nonce' === sanitize_text_field( wp_unslash( $_GET['commande'] ) ) ) : ?>
+						<div class="bagxpro-notice bagxpro-notice--error" role="alert">
+							<?php esc_html_e( 'Session expirée. Réessayez.', 'bagxpro' ); ?>
+						</div>
+					<?php elseif ( isset( $_GET['commande'] ) && 'fichier' === sanitize_text_field( wp_unslash( $_GET['commande'] ) ) ) : ?>
+						<div class="bagxpro-notice bagxpro-notice--error" role="alert">
+							<?php esc_html_e( 'Le fichier logo est invalide ou trop volumineux (max. 8 Mo).', 'bagxpro' ); ?>
+						</div>
+					<?php elseif ( isset( $_GET['commande'] ) && 'erreur' === sanitize_text_field( wp_unslash( $_GET['commande'] ) ) ) : ?>
+						<div class="bagxpro-notice bagxpro-notice--error" role="alert">
+							<?php esc_html_e( 'L’envoi a échoué. Réessayez ou contactez-nous.', 'bagxpro' ); ?>
+						</div>
+					<?php endif; ?>
+
 					<header class="bagxpro-produit-panel__header">
 						<h1><?php the_title(); ?></h1>
-						<?php if ( has_excerpt() ) : ?>
-							<p class="bagxpro-produit-panel__specs"><?php echo esc_html( wp_strip_all_tags( get_the_excerpt() ) ); ?></p>
-						<?php endif; ?>
+						<p>
+						<ul class="description-produit">
+							<li>Capacité : 80 litres</li>
+							<li>Dimensions : 50 x 40 x 30 cm</li>
+							<li>Format compact : idéal pour les petits volumes</li>
+							<li>Matériau : toile tissée résistante</li>
+							<li>Sangles : renforcées pour une manutention facile</li>
+						</ul>
+						</p>
 					</header>
+
+					<form
+						class="bagxpro-produit-form"
+						method="post"
+						action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"
+						enctype="multipart/form-data"
+					>
+						<input type="hidden" name="action" value="bagxpro_produit_commande">
+						<?php wp_nonce_field( 'bagxpro_produit_form', 'bagxpro_form_nonce' ); ?>
+						<input type="hidden" name="bagxpro_product_id" value="<?php echo (int) get_the_ID(); ?>">
+						<input type="hidden" name="bagxpro_strap_index" id="bagxpro-strap-index" value="0">
+						<input type="hidden" name="bagxpro_strap_label" id="bagxpro-strap-label" value="<?php echo esc_attr( $first_strap_label ); ?>">
+						<input
+							type="file"
+							name="bagxpro_preview_capture"
+							id="bagxpro-preview-capture"
+							class="bagxpro-visually-hidden"
+							accept="image/jpeg"
+							tabindex="-1"
+							aria-hidden="true"
+						>
 
 					<div class="bagxpro-logo-zone" data-bagxpro-logo-zone>
 						<input
@@ -152,6 +208,7 @@ while ( have_posts() ) :
 									class="bagxpro-swatch<?php echo esc_attr( $selected_class ); ?>"
 									style="<?php echo esc_attr( $style_bg ); ?>"
 									data-layer-index="<?php echo (int) $idx; ?>"
+									data-strap-label="<?php echo esc_attr( $label ); ?>"
 									aria-pressed="<?php echo esc_attr( $aria_pressed ); ?>"
 									aria-label="<?php echo esc_attr( $label ); ?>"
 								></button>
@@ -182,6 +239,7 @@ while ( have_posts() ) :
 								id="bagxpro-nom"
 								name="bagxpro_nom"
 								autocomplete="family-name"
+								required
 							>
 						</div>
 						<div class="bagxpro-field">
@@ -192,6 +250,7 @@ while ( have_posts() ) :
 								id="bagxpro-prenom"
 								name="bagxpro_prenom"
 								autocomplete="given-name"
+								required
 							>
 						</div>
 						<div class="bagxpro-field">
@@ -203,6 +262,7 @@ while ( have_posts() ) :
 								name="bagxpro_email"
 								autocomplete="email"
 								inputmode="email"
+								required
 							>
 						</div>
 						<div class="bagxpro-field">
@@ -218,9 +278,10 @@ while ( have_posts() ) :
 						</div>
 					</div>
 
-					<button type="button" class="bagxpro-btn-order">
+					<button type="submit" class="bagxpro-btn-order">
 						<?php esc_html_e( 'COMMANDER MON BIG BAG', 'bagxpro' ); ?>
 					</button>
+					</form>
 
 					<?php if ( get_the_content() ) : ?>
 						<div class="bagxpro-produit-panel__content entry-content">

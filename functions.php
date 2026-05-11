@@ -1,10 +1,51 @@
 <?php
 
 require_once get_stylesheet_directory() . '/inc/lead-form.php';
+require_once get_stylesheet_directory() . '/inc/bagxpro-produit-form-mailjet.php';
 
 add_action( 'after_setup_theme', 'bagxpro_theme_support' );
 function bagxpro_theme_support() {
 	add_theme_support( 'post-thumbnails' );
+}
+
+add_action( 'init', 'bagxpro_register_commande_post_type', 9 );
+function bagxpro_register_commande_post_type() {
+	$labels = array(
+		'name'               => __( 'Commandes', 'bagxpro' ),
+		'singular_name'      => __( 'Commande', 'bagxpro' ),
+		'menu_name'          => __( 'Commandes', 'bagxpro' ),
+		'add_new'            => __( 'Ajouter', 'bagxpro' ),
+		'add_new_item'       => __( 'Ajouter une commande', 'bagxpro' ),
+		'edit_item'          => __( 'Modifier la commande', 'bagxpro' ),
+		'new_item'           => __( 'Nouvelle commande', 'bagxpro' ),
+		'view_item'          => __( 'Voir la commande', 'bagxpro' ),
+		'search_items'       => __( 'Rechercher des commandes', 'bagxpro' ),
+		'not_found'          => __( 'Aucune commande', 'bagxpro' ),
+		'not_found_in_trash' => __( 'Aucune commande dans la corbeille', 'bagxpro' ),
+	);
+
+	register_post_type(
+		'commande',
+		array(
+			'labels'              => $labels,
+			'description'         => __( 'Demandes envoyées depuis le formulaire produit.', 'bagxpro' ),
+			'public'              => false,
+			'publicly_queryable'  => false,
+			'show_ui'             => true,
+			'show_in_menu'        => true,
+			'show_in_nav_menus'   => false,
+			'show_in_admin_bar'   => false,
+			'exclude_from_search' => true,
+			'has_archive'         => false,
+			'rewrite'             => false,
+			'query_var'           => false,
+			'capability_type'     => 'post',
+			'map_meta_cap'        => true,
+			'menu_icon'           => 'dashicons-clipboard',
+			'menu_position'       => 26,
+			'supports'            => array( 'title', 'editor' ),
+		)
+	);
 }
 
 add_action( 'init', 'bagxpro_register_produit_post_type' );
@@ -39,6 +80,60 @@ function bagxpro_register_produit_post_type() {
 			'supports'            => array( 'title', 'editor', 'thumbnail', 'excerpt' ),
 		)
 	);
+}
+
+add_filter( 'manage_edit-commande_posts_columns', 'bagxpro_commande_posts_columns' );
+function bagxpro_commande_posts_columns( $columns ) {
+	$new = array();
+	if ( isset( $columns['cb'] ) ) {
+		$new['cb'] = $columns['cb'];
+	}
+	$new['title'] = isset( $columns['title'] ) ? $columns['title'] : __( 'Titre', 'bagxpro' );
+	$new['bagxpro_product'] = __( 'Produit', 'bagxpro' );
+	$new['bagxpro_email']   = __( 'E-mail client', 'bagxpro' );
+	$new['bagxpro_mailjet'] = __( 'Notification', 'bagxpro' );
+	if ( isset( $columns['date'] ) ) {
+		$new['date'] = $columns['date'];
+	}
+	return $new;
+}
+
+add_action( 'manage_commande_posts_custom_column', 'bagxpro_commande_posts_custom_column', 10, 2 );
+function bagxpro_commande_posts_custom_column( $column, $post_id ) {
+	if ( 'bagxpro_product' === $column ) {
+		$pid = (int) get_post_meta( $post_id, '_bagxpro_product_id', true );
+		if ( $pid && 'produit' === get_post_type( $pid ) ) {
+			$link = get_edit_post_link( $pid );
+			$name = get_the_title( $pid );
+			if ( $link ) {
+				echo '<a href="' . esc_url( $link ) . '">' . esc_html( $name ) . '</a>';
+			} else {
+				echo esc_html( $name );
+			}
+		} else {
+			echo '—';
+		}
+		return;
+	}
+	if ( 'bagxpro_email' === $column ) {
+		$em = get_post_meta( $post_id, '_bagxpro_email', true );
+		echo $em ? '<a href="mailto:' . esc_attr( $em ) . '">' . esc_html( $em ) . '</a>' : '—';
+		return;
+	}
+	if ( 'bagxpro_mailjet' === $column ) {
+		$sent = get_post_meta( $post_id, '_bagxpro_mailjet_sent', true );
+		if ( '1' === $sent || 1 === $sent || true === $sent ) {
+			echo '<span class="dashicons dashicons-yes-alt" style="color:#008a20;" aria-hidden="true"></span> ';
+			esc_html_e( 'Envoyé', 'bagxpro' );
+		} elseif ( '0' === $sent || 0 === $sent ) {
+			$err = get_post_meta( $post_id, '_bagxpro_mailjet_error', true );
+			$tip = $err ? ' title="' . esc_attr( $err ) . '"' : '';
+			echo '<span class="dashicons dashicons-warning" style="color:#dba617;" aria-hidden="true"' . $tip . '></span> ';
+			esc_html_e( 'Échec envoi', 'bagxpro' );
+		} else {
+			echo '—';
+		}
+	}
 }
 
 /**
@@ -118,11 +213,19 @@ function wpm_enqueue_styles(){
 			file_exists( $css_path ) ? filemtime( $css_path ) : null
 		);
 
+		wp_enqueue_script(
+			'html2canvas',
+			'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js',
+			array(),
+			'1.4.1',
+			true
+		);
+
 		$js_path = get_stylesheet_directory() . '/js/product-bag-preview.js';
 		wp_enqueue_script(
 			'bagxpro-product-bag-preview',
 			get_stylesheet_directory_uri() . '/js/product-bag-preview.js',
-			array(),
+			array( 'html2canvas' ),
 			file_exists( $js_path ) ? filemtime( $js_path ) : null,
 			true
 		);
@@ -301,29 +404,5 @@ function impactexpo_add_mce_css( $mce_css ) {
 }
 add_filter( 'mce_css', 'impactexpo_add_mce_css' );
 
-/**
- * SMTP Brevo via PHPMailer (cles dans wp-config.php) :
- * IMPACTEXPO_BREVO_SMTP_USER, IMPACTEXPO_BREVO_SMTP_PASS,
- * IMPACTEXPO_MAIL_FROM, IMPACTEXPO_MAIL_FROM_NAME.
- */
-function impactexpo_configure_brevo_smtp( $phpmailer ) {
-    if ( ! defined( 'IMPACTEXPO_BREVO_SMTP_PASS' ) || '' === IMPACTEXPO_BREVO_SMTP_PASS ) {
-        return;
-    }
 
-    $phpmailer->isSMTP();
-    $phpmailer->Host       = 'smtp-relay.brevo.com';
-    $phpmailer->SMTPAuth   = true;
-    $phpmailer->Port       = 587;
-    $phpmailer->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
-    $phpmailer->Username   = defined( 'IMPACTEXPO_BREVO_SMTP_USER' ) ? IMPACTEXPO_BREVO_SMTP_USER : '';
-    $phpmailer->Password   = IMPACTEXPO_BREVO_SMTP_PASS;
 
-    if ( defined( 'IMPACTEXPO_MAIL_FROM' ) && IMPACTEXPO_MAIL_FROM ) {
-        $phpmailer->From = IMPACTEXPO_MAIL_FROM;
-    }
-    if ( defined( 'IMPACTEXPO_MAIL_FROM_NAME' ) && IMPACTEXPO_MAIL_FROM_NAME ) {
-        $phpmailer->FromName = IMPACTEXPO_MAIL_FROM_NAME;
-    }
-}
-add_action( 'phpmailer_init', 'impactexpo_configure_brevo_smtp' );
