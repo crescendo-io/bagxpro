@@ -1,6 +1,7 @@
 <?php
 /**
- * Formulaire fiche produit : envoi récap Mailjet (champs + logo + capture aperçu) + CPT commande + champs ACF image (client_logo, preview_client).
+ * Formulaire fiche produit : Mailjet + CPT commande + ACF. Sécurité : honeypot, rate limit IP/e-mail,
+ * sangles recalculées serveur (ACF), logos raster uniquement (pas SVG), html2canvas en local, journaux sans fuite détail.
  *
  * Préférez dans wp-config.php :
  * define( 'BAGXPRO_MAILJET_API_KEY', '...' );
@@ -11,6 +12,90 @@
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
+}
+
+/**
+ * Adresse IP du client (REMOTE_ADDR). X-Forwarded-For seulement si le filtre de confiance est activé.
+ *
+ * @return string
+ */
+function bagxpro_produit_get_request_ip() {
+	$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? trim( (string) wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
+	if ( '' === $ip ) {
+		return '0.0.0.0';
+	}
+	$ip = sanitize_text_field( $ip );
+	if ( (bool) apply_filters( 'bagxpro_produit_trust_x_forwarded_for', false ) && ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+		$xff   = trim( (string) wp_unslash( $_SERVER['HTTP_X_FORWARDED_FOR'] ) );
+		$parts = explode( ',', $xff );
+		$cand  = isset( $parts[0] ) ? trim( $parts[0] ) : '';
+		if ( '' !== $cand && filter_var( $cand, FILTER_VALIDATE_IP ) ) {
+			$ip = sanitize_text_field( $cand );
+		}
+	}
+	return $ip;
+}
+
+/**
+ * Libellés des couleurs de sangles issus du produit (ACF), pour ne pas faire confiance au POST.
+ *
+ * @param int $product_id ID post produit.
+ * @return array{labels: array<int, string>, count: int}
+ */
+function bagxpro_produit_get_strap_palette( $product_id ) {
+	$product_id = (int) $product_id;
+	$labels     = array();
+
+	if ( $product_id > 0 && function_exists( 'get_field' ) ) {
+		$couleurs_acf = get_field( 'product_colors', $product_id );
+		if ( ! empty( $couleurs_acf ) && is_array( $couleurs_acf ) ) {
+			foreach ( $couleurs_acf as $i => $row ) {
+				$lbl = isset( $row['product_color_label'] ) ? (string) $row['product_color_label'] : '';
+				$lbl = sanitize_text_field( $lbl );
+				if ( '' === $lbl ) {
+					$lbl = sprintf( /* translators: %d: color index */ __( 'Couleur %d', 'bagxpro' ), $i + 1 );
+				}
+				$labels[] = $lbl;
+			}
+		}
+	}
+
+	if ( empty( $labels ) ) {
+		$labels[] = __( 'Couleur 1', 'bagxpro' );
+	}
+
+	return array(
+		'labels' => $labels,
+		'count'  => count( $labels ),
+	);
+}
+
+/**
+ * Vérifie et incrémente le rate limiting (IP + e-mail). Appeler après validation des champs obligatoires.
+ *
+ * @param string $email E-mail déjà normalisé (sanitize_email).
+ * @return bool False si la limite est dépassée.
+ */
+function bagxpro_produit_form_rate_limit_tick( $email ) {
+	$window = max( 60, (int) apply_filters( 'bagxpro_produit_form_rate_limit_window', 15 * MINUTE_IN_SECONDS ) );
+	$max_ip = max( 1, (int) apply_filters( 'bagxpro_produit_form_rate_limit_max_ip', 10 ) );
+	$max_em = max( 1, (int) apply_filters( 'bagxpro_produit_form_rate_limit_max_email', 5 ) );
+
+	$ip  = bagxpro_produit_get_request_ip();
+	$em  = strtolower( trim( (string) $email ) );
+	$k_i = 'bagxprl_ip_' . wp_hash( 'ip|' . $ip );
+	$k_e = 'bagxprl_em_' . wp_hash( 'em|' . $em );
+
+	$n_ip = (int) get_transient( $k_i );
+	$n_em = (int) get_transient( $k_e );
+	if ( $n_ip >= $max_ip || $n_em >= $max_em ) {
+		return false;
+	}
+
+	set_transient( $k_i, $n_ip + 1, $window );
+	set_transient( $k_e, $n_em + 1, $window );
+
+	return true;
 }
 
 /**
@@ -102,14 +187,6 @@ function bagxpro_produit_mailjet_attachment_from_upload( $field_name, array $all
 		if ( isset( $raster[ $img_mime ] ) && in_array( $raster[ $img_mime ], $allowed_ext, true ) ) {
 			$ext  = $raster[ $img_mime ];
 			$mime = $img_mime;
-		}
-	}
-
-	if ( '' === $ext && in_array( 'svg', $allowed_ext, true ) ) {
-		$head = file_get_contents( $tmp, false, null, 0, 1024 ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
-		if ( is_string( $head ) && ( preg_match( '#<svg[\s/>]#i', $head ) || preg_match( '/^\s*<\?xml/i', $head ) ) ) {
-			$ext  = 'svg';
-			$mime = 'image/svg+xml';
 		}
 	}
 
@@ -223,7 +300,7 @@ function bagxpro_mailjet_send_message( array $args ) {
 	if ( is_wp_error( $response ) ) {
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-			error_log( 'Mailjet WP_Error: ' . $response->get_error_message() );
+			error_log( 'bagxpro Mailjet: erreur transport (WP_Error).' );
 		}
 		return $response;
 	}
@@ -237,7 +314,7 @@ function bagxpro_mailjet_send_message( array $args ) {
 			: wp_remote_retrieve_body( $response );
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-			error_log( 'Mailjet HTTP ' . $code . ' : ' . $msg );
+			error_log( 'bagxpro Mailjet: HTTP ' . (int) $code );
 		}
 		return new WP_Error( 'bagxpro_mailjet_http', $msg ? $msg : __( 'Erreur Mailjet.', 'bagxpro' ) );
 	}
@@ -341,7 +418,7 @@ function bagxpro_create_commande_record( array $args ) {
 	if ( is_wp_error( $post_id ) || ! $post_id ) {
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && is_wp_error( $post_id ) ) {
 			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-			error_log( 'bagxpro_create_commande_record: ' . $post_id->get_error_message() );
+			error_log( 'bagxpro_create_commande_record: échec wp_insert_post.' );
 		}
 		return 0;
 	}
@@ -357,6 +434,8 @@ function bagxpro_create_commande_record( array $args ) {
 	update_post_meta( $post_id, '_bagxpro_strap_label', $args['strap_lbl'] );
 	update_post_meta( $post_id, '_bagxpro_has_logo', ! empty( $args['has_logo'] ) ? '1' : '0' );
 	update_post_meta( $post_id, '_bagxpro_has_preview', ! empty( $args['has_preview'] ) ? '1' : '0' );
+	update_post_meta( $post_id, '_bagxpro_rgpd_consent', '1' );
+	update_post_meta( $post_id, '_bagxpro_rgpd_consent_at', current_time( 'mysql', true ) );
 	update_post_meta( $post_id, '_bagxpro_mailjet_sent', '' );
 
 	/**
@@ -380,7 +459,7 @@ function bagxpro_create_commande_record( array $args ) {
 function bagxpro_commande_set_acf_image_field( $post_id, $field_name, $attachment_id ) {
 	$post_id         = (int) $post_id;
 	$attachment_id   = (int) $attachment_id;
-	$field_name      = (string) $field_name;
+	$field_name      = sanitize_key( (string) $field_name );
 	if ( $post_id < 1 || $attachment_id < 1 || '' === $field_name ) {
 		return;
 	}
@@ -412,8 +491,14 @@ function bagxpro_commande_save_acf_uploads( $commande_post_id ) {
 	require_once ABSPATH . 'wp-admin/includes/media.php';
 	require_once ABSPATH . 'wp-admin/includes/image.php';
 
-	$field_logo    = apply_filters( 'bagxpro_commande_acf_field_logo', 'client_logo', $commande_post_id );
-	$field_preview = apply_filters( 'bagxpro_commande_acf_field_preview', 'preview_client', $commande_post_id );
+	$field_logo    = sanitize_key( (string) apply_filters( 'bagxpro_commande_acf_field_logo', 'client_logo', $commande_post_id ) );
+	$field_preview = sanitize_key( (string) apply_filters( 'bagxpro_commande_acf_field_preview', 'preview_client', $commande_post_id ) );
+	if ( '' === $field_logo ) {
+		$field_logo = 'client_logo';
+	}
+	if ( '' === $field_preview ) {
+		$field_preview = 'preview_client';
+	}
 
 	if ( ! empty( $_FILES['bagxpro_logo'] ) && is_array( $_FILES['bagxpro_logo'] ) && bagxpro_produit_upload_tmp_is_usable( $_FILES['bagxpro_logo'], 'bagxpro_logo' ) ) {
 		$logo_id = media_handle_upload( 'bagxpro_logo', $commande_post_id );
@@ -450,13 +535,16 @@ function bagxpro_handle_produit_form_submit() {
 		exit;
 	}
 
+	if ( isset( $_POST['bagxpro_hp'] ) && '' !== trim( (string) wp_unslash( $_POST['bagxpro_hp'] ) ) ) {
+		wp_safe_redirect( get_permalink( $product_id ) );
+		exit;
+	}
+
 	$nom       = isset( $_POST['bagxpro_nom'] ) ? sanitize_text_field( wp_unslash( $_POST['bagxpro_nom'] ) ) : '';
 	$prenom    = isset( $_POST['bagxpro_prenom'] ) ? sanitize_text_field( wp_unslash( $_POST['bagxpro_prenom'] ) ) : '';
 	$email     = isset( $_POST['bagxpro_email'] ) ? sanitize_email( wp_unslash( $_POST['bagxpro_email'] ) ) : '';
 	$telephone = isset( $_POST['bagxpro_telephone'] ) ? sanitize_text_field( wp_unslash( $_POST['bagxpro_telephone'] ) ) : '';
 	$tier      = isset( $_POST['bagxpro_quantity_tier'] ) ? sanitize_text_field( wp_unslash( $_POST['bagxpro_quantity_tier'] ) ) : '';
-	$strap_idx = isset( $_POST['bagxpro_strap_index'] ) ? sanitize_text_field( wp_unslash( $_POST['bagxpro_strap_index'] ) ) : '';
-	$strap_lbl = isset( $_POST['bagxpro_strap_label'] ) ? sanitize_text_field( wp_unslash( $_POST['bagxpro_strap_label'] ) ) : '';
 
 	$allowed_tiers = array( '100', '500', '1000' );
 	if ( ! in_array( $tier, $allowed_tiers, true ) ) {
@@ -467,6 +555,29 @@ function bagxpro_handle_produit_form_submit() {
 		wp_safe_redirect( add_query_arg( 'commande', 'incomplet', get_permalink( $product_id ) ) );
 		exit;
 	}
+
+	$rgpd_consent = isset( $_POST['bagxpro_rgpd_consent'] ) ? sanitize_text_field( wp_unslash( $_POST['bagxpro_rgpd_consent'] ) ) : '';
+	if ( '1' !== $rgpd_consent ) {
+		wp_safe_redirect( add_query_arg( 'commande', 'rgpd', get_permalink( $product_id ) ) );
+		exit;
+	}
+
+	if ( ! bagxpro_produit_form_rate_limit_tick( $email ) ) {
+		wp_safe_redirect( add_query_arg( 'commande', 'limite', get_permalink( $product_id ) ) );
+		exit;
+	}
+
+	$palette    = bagxpro_produit_get_strap_palette( $product_id );
+	$strap_i    = isset( $_POST['bagxpro_strap_index'] ) ? (int) wp_unslash( $_POST['bagxpro_strap_index'] ) : 0;
+	if ( $strap_i < 0 ) {
+		$strap_i = 0;
+	}
+	$max_idx = max( 0, $palette['count'] - 1 );
+	if ( $strap_i > $max_idx ) {
+		$strap_i = $max_idx;
+	}
+	$strap_idx = (string) $strap_i;
+	$strap_lbl = isset( $palette['labels'][ $strap_i ] ) ? $palette['labels'][ $strap_i ] : $palette['labels'][0];
 
 	$product_title = get_the_title( $product_id );
 	$tier_labels   = array(
@@ -485,6 +596,7 @@ function bagxpro_handle_produit_form_submit() {
 		__( 'Nombre de sacs', 'bagxpro' ) . ': ' . $tier_label,
 		__( 'Couleur des sangles (index)', 'bagxpro' ) . ': ' . $strap_idx,
 		__( 'Couleur des sangles (libellé)', 'bagxpro' ) . ': ' . $strap_lbl,
+		__( 'Consentement RGPD (traitement des données, conservation sans limite de durée)', 'bagxpro' ) . ': ' . __( 'oui', 'bagxpro' ) . ' — ' . wp_date( __( 'd/m/Y à H:i', 'bagxpro' ) ),
 		'',
 		__( 'Pièces jointes : capture JPEG de l’aperçu (si jointe) et logo client (si fourni).', 'bagxpro' ),
 	);
@@ -499,13 +611,18 @@ function bagxpro_handle_produit_form_submit() {
 		array( __( 'Téléphone', 'bagxpro' ), esc_html( $telephone ) ),
 		array( __( 'Nombre de sacs', 'bagxpro' ), esc_html( $tier_label ) ),
 		array( __( 'Couleur des sangles', 'bagxpro' ), esc_html( $strap_lbl ) . ' <small>(#' . esc_html( $strap_idx ) . ')</small>' ),
+		array(
+			__( 'Consentement RGPD', 'bagxpro' ),
+			esc_html__( 'Oui — conservation des données sans limite de durée (information portée à la connaissance sur le formulaire).', 'bagxpro' )
+				. ' <small>(' . esc_html( wp_date( __( 'd/m/Y à H:i', 'bagxpro' ) ) ) . ')</small>',
+		),
 	) as $row ) {
-		$html_rows .= '<tr><th style="text-align:left;padding:8px 12px;border:1px solid #ddd;background:#f5f5f5;">' . $row[0] . '</th><td style="padding:8px 12px;border:1px solid #ddd;">' . $row[1] . '</td></tr>';
+		$html_rows .= '<tr><th style="text-align:left;padding:8px 12px;border:1px solid #ddd;background:#f5f5f5;">' . esc_html( $row[0] ) . '</th><td style="padding:8px 12px;border:1px solid #ddd;">' . $row[1] . '</td></tr>';
 	}
 
 	$attachments = array();
 	$max_bytes   = (int) apply_filters( 'bagxpro_produit_logo_max_bytes', 8 * 1024 * 1024 );
-	$logo_exts   = array( 'jpg', 'jpeg', 'png', 'gif', 'webp', 'svg' );
+	$logo_exts   = array( 'jpg', 'jpeg', 'png', 'gif', 'webp' );
 
 	if ( ! empty( $_FILES['bagxpro_logo'] ) && is_array( $_FILES['bagxpro_logo'] ) && bagxpro_produit_upload_tmp_is_usable( $_FILES['bagxpro_logo'], 'bagxpro_logo' ) ) {
 		$logo_att = bagxpro_produit_mailjet_attachment_from_upload( 'bagxpro_logo', $logo_exts, $max_bytes, 'logo.png' );
@@ -617,7 +734,11 @@ function bagxpro_handle_produit_form_submit() {
 		wp_set_current_user( $author_fix );
 		if ( is_wp_error( $result ) ) {
 			update_post_meta( $commande_id, '_bagxpro_mailjet_sent', '0' );
-			update_post_meta( $commande_id, '_bagxpro_mailjet_error', $result->get_error_message() );
+			$err_safe = sanitize_text_field( $result->get_error_message() );
+			if ( strlen( $err_safe ) > 500 ) {
+				$err_safe = substr( $err_safe, 0, 500 );
+			}
+			update_post_meta( $commande_id, '_bagxpro_mailjet_error', $err_safe );
 		} else {
 			update_post_meta( $commande_id, '_bagxpro_mailjet_sent', '1' );
 			delete_post_meta( $commande_id, '_bagxpro_mailjet_error' );

@@ -213,11 +213,12 @@ function wpm_enqueue_styles(){
 			file_exists( $css_path ) ? filemtime( $css_path ) : null
 		);
 
+		$html2_path = get_stylesheet_directory() . '/js/vendor/html2canvas.min.js';
 		wp_enqueue_script(
 			'html2canvas',
-			'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js',
+			get_stylesheet_directory_uri() . '/js/vendor/html2canvas.min.js',
 			array(),
-			'1.4.1',
+			file_exists( $html2_path ) ? filemtime( $html2_path ) : '1.4.1',
 			true
 		);
 

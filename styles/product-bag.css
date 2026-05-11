@@ -409,6 +409,61 @@
 	color: var(--bagxpro-sim-text);
 }
 
+/* Information RGPD + consentement */
+.bagxpro-rgpd {
+	margin-top: 8px;
+	margin-bottom: 24px;
+	padding: 16px 18px;
+	background: rgba(0, 0, 0, 0.03);
+	border: 1px solid var(--bagxpro-sim-line);
+	border-radius: 8px;
+}
+
+.bagxpro-rgpd__text {
+	margin: 0 0 12px;
+	font-size: 13px;
+	line-height: 1.55;
+	color: var(--bagxpro-sim-muted, #666);
+}
+
+.bagxpro-rgpd__privacy {
+	margin: 0 0 14px;
+	font-size: 13px;
+}
+
+.bagxpro-rgpd__privacy-link {
+	color: var(--bagxpro-sim-gold, #c9a227);
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+.bagxpro-rgpd__privacy-link:hover {
+	opacity: 0.9;
+}
+
+.bagxpro-rgpd__consent {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	margin: 0;
+	cursor: pointer;
+	font-size: 14px;
+	line-height: 1.45;
+	color: var(--bagxpro-sim-text);
+}
+
+.bagxpro-rgpd__checkbox {
+	flex-shrink: 0;
+	width: 18px;
+	height: 18px;
+	margin-top: 2px;
+	accent-color: var(--bagxpro-sim-gold, #c9a227);
+}
+
+.bagxpro-rgpd__consent-text {
+	flex: 1;
+}
+
 .bagxpro-input {
 	display: block;
 	box-sizing: border-box;

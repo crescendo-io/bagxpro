@@ -130,6 +130,14 @@ while ( have_posts() ) :
 						<div class="bagxpro-notice bagxpro-notice--error" role="alert">
 							<?php esc_html_e( 'L’envoi a échoué. Réessayez ou contactez-nous.', 'bagxpro' ); ?>
 						</div>
+					<?php elseif ( isset( $_GET['commande'] ) && 'limite' === sanitize_text_field( wp_unslash( $_GET['commande'] ) ) ) : ?>
+						<div class="bagxpro-notice bagxpro-notice--error" role="alert">
+							<?php esc_html_e( 'Trop de demandes envoyées récemment. Patientez quelques minutes avant de réessayer.', 'bagxpro' ); ?>
+						</div>
+					<?php elseif ( isset( $_GET['commande'] ) && 'rgpd' === sanitize_text_field( wp_unslash( $_GET['commande'] ) ) ) : ?>
+						<div class="bagxpro-notice bagxpro-notice--error" role="alert">
+							<?php esc_html_e( 'Merci d’accepter l’information sur les données personnelles avant d’envoyer votre demande.', 'bagxpro' ); ?>
+						</div>
 					<?php endif; ?>
 
 					<header class="bagxpro-produit-panel__header">
@@ -156,6 +164,10 @@ while ( have_posts() ) :
 						<input type="hidden" name="bagxpro_product_id" value="<?php echo (int) get_the_ID(); ?>">
 						<input type="hidden" name="bagxpro_strap_index" id="bagxpro-strap-index" value="0">
 						<input type="hidden" name="bagxpro_strap_label" id="bagxpro-strap-label" value="<?php echo esc_attr( $first_strap_label ); ?>">
+						<div class="bagxpro-visually-hidden" aria-hidden="true">
+							<label for="bagxpro-hp"><?php esc_html_e( 'Laisser vide', 'bagxpro' ); ?></label>
+							<input type="text" name="bagxpro_hp" id="bagxpro-hp" value="" tabindex="-1" autocomplete="off">
+						</div>
 						<input
 							type="file"
 							name="bagxpro_preview_capture"
@@ -172,7 +184,7 @@ while ( have_posts() ) :
 							id="bagxpro-logo"
 							class="bagxpro-logo-zone__input"
 							name="bagxpro_logo"
-							accept="image/*"
+							accept="image/jpeg,image/png,image/gif,image/webp,.jpg,.jpeg,.png,.gif,.webp"
 							data-bagxpro-logo-input
 						>
 						<div class="bagxpro-logo-zone__visual">
@@ -276,6 +288,31 @@ while ( have_posts() ) :
 								inputmode="tel"
 							>
 						</div>
+					</div>
+
+					<div class="bagxpro-field bagxpro-rgpd">
+						<p class="bagxpro-rgpd__text">
+							<?php esc_html_e( 'Les informations collectées (identité, coordonnées, fichiers joints du configurateur) sont nécessaires au traitement de votre demande. Elles sont conservées sans limite de durée, jusqu’à exercice de vos droits (accès, rectification, effacement, limitation du traitement, opposition, portabilité) ou obligation légale, conformément au règlement (UE) 2016/679 (RGPD).', 'bagxpro' ); ?>
+						</p>
+						<?php
+						$bagxpro_privacy_url = function_exists( 'wp_get_privacy_policy_url' ) ? wp_get_privacy_policy_url() : '';
+						if ( $bagxpro_privacy_url ) :
+							?>
+							<p class="bagxpro-rgpd__privacy">
+								<a class="bagxpro-rgpd__privacy-link" href="<?php echo esc_url( $bagxpro_privacy_url ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Politique de confidentialité', 'bagxpro' ); ?></a>
+							</p>
+						<?php endif; ?>
+						<label class="bagxpro-rgpd__consent" for="bagxpro-rgpd-consent">
+							<input
+								type="checkbox"
+								name="bagxpro_rgpd_consent"
+								id="bagxpro-rgpd-consent"
+								class="bagxpro-rgpd__checkbox"
+								value="1"
+								required
+							>
+							<span class="bagxpro-rgpd__consent-text"><?php esc_html_e( 'Je confirme avoir pris connaissance de l’information ci-dessus et accepter le traitement de mes données personnelles dans ce cadre.', 'bagxpro' ); ?></span>
+						</label>
 					</div>
 
 					<button type="submit" class="bagxpro-btn-order">

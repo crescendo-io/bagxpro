@@ -156,6 +156,10 @@
 				clearLogo();
 				return;
 			}
+			if (file.type === 'image/svg+xml') {
+				clearLogo();
+				return;
+			}
 
 			var reader = new FileReader();
 			reader.onload = function (e) {
