@@ -2,6 +2,8 @@
 
 require_once get_stylesheet_directory() . '/inc/lead-form.php';
 require_once get_stylesheet_directory() . '/inc/bagxpro-produit-form-mailjet.php';
+require_once get_stylesheet_directory() . '/inc/acf-front-page.php';
+require_once get_stylesheet_directory() . '/inc/acf-list-products.php';
 
 add_action( 'after_setup_theme', 'bagxpro_theme_support' );
 function bagxpro_theme_support() {
@@ -77,7 +79,7 @@ function bagxpro_register_produit_post_type() {
 			'rewrite'             => array( 'slug' => 'produit' ),
 			'capability_type'     => 'post',
 			'menu_icon'           => 'dashicons-cart',
-			'supports'            => array( 'title', 'editor', 'thumbnail', 'excerpt' ),
+			'supports'            => array( 'title', 'editor', 'thumbnail', 'excerpt', 'page-attributes' ),
 		)
 	);
 }

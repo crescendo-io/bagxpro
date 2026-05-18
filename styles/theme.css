@@ -880,7 +880,6 @@ button{
         position: relative;
         display: flex;
         flex-direction: column;
-        height: 18vw;
         justify-content: flex-end;
         img{
             max-width: 90%;
@@ -920,7 +919,19 @@ button{
     display: flex;
     flex-direction: column;
     justify-content: center; /* centre verticalement */
-    padding: 80px;
+    padding: 00px 80px;
+}
+
+.card-intro-product__text {
+    margin-top: 0;
+}
+
+.card-intro-product__text p:last-child {
+    margin-bottom: 0;
+}
+
+.card-intro-product--empty {
+    opacity: 0.85;
 }
 
 
