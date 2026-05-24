@@ -981,3 +981,22 @@ button{
     padding-top: 100px;
     padding-bottom: 100px;
 }
+
+
+/* PAGE SERVICES */
+
+.parent-pageid-554{
+    .container-text-only {
+        p, h1, h2, h3, h4 {
+            max-width: 85%;
+        }
+
+        hr{
+            margin: 40px 0;
+        }
+    }
+
+    .container-image-full{
+
+    }
+}
