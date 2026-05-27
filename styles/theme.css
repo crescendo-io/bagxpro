@@ -223,6 +223,8 @@ header.linear ul{
 header.linear ul li a{
     font-weight: 500;
     font-size: 14px;
+    padding: 0 15px;
+    display: block;
     text-transform: uppercase;
     text-decoration: none;
     transition: color 0.2s ease;
