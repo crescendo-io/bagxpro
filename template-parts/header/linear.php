@@ -6,14 +6,15 @@
     $option_logo_scroll_array = get_custom_thumb($option_logo_scroll, 'full');
 ?>
 
+<div class="bagxpro-site-header">
 <div class="sentence-header">
     Profitez de -15% sur vos big bags personnalisés pour toute commande en volume. Qualité pro, impression sur mesure et livraison rapide.
 </div>
 <header class="burger linear">
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-sm-3 col-3 visible-xs">
-                <div class="button-menu">
+        <div class="row align-items-center bagxpro-header-row">
+            <div class="col-3 col-md-2 visible-xs">
+                <div class="button-menu" role="button" tabindex="0" aria-label="<?php esc_attr_e( 'Ouvrir le menu', 'bagxpro' ); ?>">
                     <div class="barre"></div>
                     <div class="text">
                         menu
@@ -21,7 +22,7 @@
                 </div>
             </div>
 
-            <div class="col-sm-3 col-3">
+            <div class="col-6 col-md-3 bagxpro-header-logo">
                 <?php if(isset($option_logo_primary_array['url']) && $option_logo_primary_array['url']): ?>
                 <a href="<?= get_site_url(); ?>">
                     <img src="<?= $option_logo_primary_array['url']; ?>" class="logo" alt="<?= $option_logo_primary_array['alt']; ?>">
@@ -30,18 +31,38 @@
                 <?php endif; ?>
             </div>
 
-            <div class="col-sm-6 hidden-xs text-center">
+            <div class="col-md-5 hidden-xs text-center bagxpro-header-nav">
                 <?= wp_nav_menu(array(
-                    'menu'				=> "menu", // (int|string|WP_Term) Desired menu. Accepts a menu ID, slug, name, or object.
+                    'menu'				=> "menu",
                     'menu_class'		=> "",
-                    'container_class'	=> "menu",// (string) CSS class to use for the ul element which forms the menu. Default 'menu'.
+                    'container_class'	=> "menu",
                 )); ?>
             </div>
 
-            <div class="col-sm-3 col-3 text-right">
-                <a href="#modal-configurator" class="button primary">CONFIGURER MON PRODUITS  +</a>
+            <div class="col-3 col-md-2 bagxpro-header-cta text-right">
+                <a href="#modal-configurator" class="button primary modal-configurator-button">
+                    <span class="bagxpro-header-cta__full hidden-xs">CONFIGURER MON PRODUITS  +</span>
+                    <span class="bagxpro-header-cta__short visible-xs" aria-hidden="true">+</span>
+                </a>
             </div>
         </div>
     </div>
     <?php custom_breadcrumb(); ?>
 </header>
+
+<div class="menu-navigation" aria-hidden="true">
+    <button
+        type="button"
+        class="bagxpro-menu-close"
+        data-bagxpro-menu-close
+        aria-label="<?php esc_attr_e( 'Fermer le menu', 'bagxpro' ); ?>"
+    >
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <?= wp_nav_menu(array(
+        'menu'				=> "menu",
+        'menu_class'		=> "",
+        'container_class'	=> "menu",
+    )); ?>
+</div>
+</div>

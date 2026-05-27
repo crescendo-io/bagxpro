@@ -252,6 +252,80 @@ header.burger{
     border-bottom: 1px solid #ccc;
 }
 
+.bagxpro-site-header {
+    position: relative;
+    z-index: 100;
+    width: 100%;
+}
+
+header.burger.linear .button-menu .barre,
+header.burger.linear .button-menu .barre:before,
+header.burger.linear .button-menu .barre:after {
+    background: #000;
+}
+
+header.burger.linear .button-menu .text {
+    color: #000;
+}
+
+.bagxpro-header-logo {
+    text-align: center;
+}
+
+.bagxpro-header-logo a {
+    display: inline-block;
+    line-height: 0;
+}
+
+.bagxpro-header-row {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+/* Menu mobile latéral */
+.menu-navigation .menu {
+    z-index: 100060;
+}
+
+body.nav-is-visible .menu-navigation .menu {
+    visibility: visible;
+}
+
+.bagxpro-menu-close {
+    position: fixed;
+    top: 16px;
+    left: calc(min(40vw, 320px) - 52px);
+    z-index: 100061;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, background 0.2s ease;
+    outline: none;
+    box-shadow: none;
+}
+
+body.nav-is-visible .bagxpro-menu-close {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.bagxpro-menu-close:hover,
+.bagxpro-menu-close:focus-visible {
+    background: rgba(255, 255, 255, 0.22);
+    outline: none;
+}
+
 
 /* FOOTER */
 footer{
@@ -1144,11 +1218,7 @@ body.bagxpro-loader-done .strate-hero.home .container-bag-home .placeholder {
     }
 }
 
-/* SINGLE PRODUIT */
-.bagxpro-single-produit{
-    padding-top: 100px;
-    padding-bottom: 100px;
-}
+/* SINGLE PRODUIT — padding géré dans product-bag.css */
 
 
 /* Loader plein écran au chargement */

@@ -185,6 +185,13 @@ function wpm_enqueue_styles(){
     //wp_enqueue_style( 'parent-style', get_template_directory_uri() . '/styles/theme.css' );
     wp_enqueue_style('lightbox', get_stylesheet_directory_uri() . '/styles/lightbox.css', array(), filemtime(get_template_directory() . '/styles/theme.css'));
     wp_enqueue_style('theme', get_stylesheet_directory_uri() . '/styles/theme.css', array(), filemtime(get_template_directory() . '/styles/theme.css'));
+    $responsive_css = get_stylesheet_directory() . '/styles/responsive.css';
+    wp_enqueue_style(
+        'bagxpro-responsive',
+        get_stylesheet_directory_uri() . '/styles/responsive.css',
+        array( 'theme' ),
+        file_exists( $responsive_css ) ? filemtime( $responsive_css ) : null
+    );
     wp_enqueue_script(
         'beforeafter', // Identifiant unique du script
         get_stylesheet_directory_uri() . '/js/beforeafter.js', // URL du fichier JS
@@ -233,6 +240,15 @@ function wpm_enqueue_styles(){
 		get_stylesheet_directory_uri() . '/js/bagxpro-configurator-sidebar.js',
 		array(),
 		file_exists( $configurator_sidebar_js ) ? filemtime( $configurator_sidebar_js ) : null,
+		true
+	);
+
+	$mobile_nav_js = get_stylesheet_directory() . '/js/bagxpro-mobile-nav.js';
+	wp_enqueue_script(
+		'bagxpro-mobile-nav',
+		get_stylesheet_directory_uri() . '/js/bagxpro-mobile-nav.js',
+		array( 'jquery', 'app' ),
+		file_exists( $mobile_nav_js ) ? filemtime( $mobile_nav_js ) : null,
 		true
 	);
 
