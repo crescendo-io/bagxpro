@@ -222,6 +222,8 @@ $bagxpro_stat_to_int = static function ( $raw ) {
 	</div>
 </div>
 
+<main id="bagxpro-home-main" class="bagxpro-home-main">
+
 <div class="list-logo">
 	<ul>
 		<li class="label">
@@ -342,5 +344,7 @@ if ( $bagxpro_home_id && function_exists( 'have_rows' ) && have_rows( 'page', $b
 	endwhile;
 endif;
 ?>
+
+</main>
 
 <?php get_footer(); ?>

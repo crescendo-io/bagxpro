@@ -4,6 +4,7 @@ require_once get_stylesheet_directory() . '/inc/lead-form.php';
 require_once get_stylesheet_directory() . '/inc/bagxpro-produit-form-mailjet.php';
 require_once get_stylesheet_directory() . '/inc/acf-front-page.php';
 require_once get_stylesheet_directory() . '/inc/acf-list-products.php';
+require_once get_stylesheet_directory() . '/inc/bagxpro-page-loader.php';
 
 add_action( 'after_setup_theme', 'bagxpro_theme_support' );
 function bagxpro_theme_support() {
@@ -205,6 +206,24 @@ function wpm_enqueue_styles(){
             'ajaxUrl' => admin_url( 'admin-ajax.php' ),
         )
     );
+
+	$page_loader_js = get_stylesheet_directory() . '/js/bagxpro-page-loader.js';
+	wp_enqueue_script(
+		'bagxpro-page-loader',
+		get_stylesheet_directory_uri() . '/js/bagxpro-page-loader.js',
+		array(),
+		file_exists( $page_loader_js ) ? filemtime( $page_loader_js ) : null,
+		true
+	);
+
+	$scroll_reveal_js = get_stylesheet_directory() . '/js/bagxpro-scroll-reveal.js';
+	wp_enqueue_script(
+		'bagxpro-scroll-reveal',
+		get_stylesheet_directory_uri() . '/js/bagxpro-scroll-reveal.js',
+		array(),
+		file_exists( $scroll_reveal_js ) ? filemtime( $scroll_reveal_js ) : null,
+		true
+	);
 
 	if ( is_front_page() ) {
 		$home_stats_js = get_stylesheet_directory() . '/js/home-stats-count.js';

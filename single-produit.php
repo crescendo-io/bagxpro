@@ -154,7 +154,7 @@ while ( have_posts() ) :
 					</header>
 
 					<form
-						class="bagxpro-produit-form"
+						class="bagxpro-produit-form bagxpro-no-scroll-reveal"
 						method="post"
 						action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"
 						enctype="multipart/form-data"

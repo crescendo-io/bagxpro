@@ -17,11 +17,6 @@ $(window).on('load',function(){
         $('.filters-form').submit();
     });
 
-    $('.loader svg').addClass('active');
-    setTimeout(function(){
-        $('.loader').fadeOut();
-    },1200);
-
 });
 
 
