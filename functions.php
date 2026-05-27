@@ -6,6 +6,7 @@ require_once get_stylesheet_directory() . '/inc/acf-front-page.php';
 require_once get_stylesheet_directory() . '/inc/acf-list-products.php';
 require_once get_stylesheet_directory() . '/inc/bagxpro-page-loader.php';
 require_once get_stylesheet_directory() . '/inc/bagxpro-configurator-sidebar.php';
+require_once get_stylesheet_directory() . '/inc/bagxpro-related-products.php';
 
 add_action( 'after_setup_theme', 'bagxpro_theme_support' );
 function bagxpro_theme_support() {
@@ -246,7 +247,9 @@ function wpm_enqueue_styles(){
 		);
 	}
 
-	if ( is_singular( 'produit' ) ) {
+	$bagxpro_load_product_bag_css = is_singular( 'produit' ) || bagxpro_is_nos_solutions_child_page();
+
+	if ( $bagxpro_load_product_bag_css ) {
 		$css_path = get_stylesheet_directory() . '/styles/product-bag.css';
 		wp_enqueue_style(
 			'bagxpro-product-bag',
@@ -254,7 +257,9 @@ function wpm_enqueue_styles(){
 			array( 'theme' ),
 			file_exists( $css_path ) ? filemtime( $css_path ) : null
 		);
+	}
 
+	if ( is_singular( 'produit' ) ) {
 		$html2_path = get_stylesheet_directory() . '/js/vendor/html2canvas.min.js';
 		wp_enqueue_script(
 			'html2canvas',
