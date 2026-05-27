@@ -224,7 +224,23 @@ header.linear ul li a{
     font-weight: 500;
     font-size: 14px;
     text-transform: uppercase;
+    text-decoration: none;
+    transition: color 0.2s ease;
 }
+
+/* Menu principal header — hover */
+header.burger.linear .menu > ul > li > a {
+    color: #000;
+    text-decoration: none;
+}
+
+header.burger.linear .menu > ul > li > a:hover,
+header.burger.linear .menu > ul > li > a:focus-visible {
+    color: #eab933;
+    text-decoration: none;
+    outline: none;
+}
+
 header.burger .logo, header.burger .logo-scroll{
     margin-top: 5px;
     width: 170px;
@@ -1186,6 +1202,190 @@ body.bagxpro-loader-done .strate-hero.home .container-bag-home .placeholder {
     .bagxpro-page-loader__logo,
     .bagxpro-page-loader__ring {
         animation: none;
+    }
+}
+
+/* Sidebar configurateur produits */
+body.bagxpro-configurator-open {
+    overflow: hidden;
+}
+
+.bagxpro-configurator {
+    position: fixed;
+    inset: 0;
+    z-index: 100050;
+    display: none;
+    pointer-events: none;
+}
+
+.bagxpro-configurator:not([hidden]) {
+    display: block;
+}
+
+.bagxpro-configurator.is-open {
+    pointer-events: auto;
+}
+
+.bagxpro-configurator__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    transition: opacity 0.36s ease;
+}
+
+.bagxpro-configurator.is-open .bagxpro-configurator__overlay {
+    opacity: 1;
+}
+
+.bagxpro-configurator__panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    width: min(100%, 420px);
+    max-width: 100%;
+    height: 100%;
+    background: #fff;
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.12);
+    transform: translate3d(100%, 0, 0);
+    transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bagxpro-configurator.is-open .bagxpro-configurator__panel {
+    transform: translate3d(0, 0, 0);
+}
+
+.bagxpro-configurator__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 24px 24px 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.bagxpro-configurator__header h2 {
+    margin: 0;
+    font-size: clamp(18px, 2vw, 24px);
+    line-height: 1.2;
+}
+
+.bagxpro-configurator__close {
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 50%;
+    background: #f1f1f1;
+    color: #000;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+    outline: none;
+    box-shadow: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.2s ease;
+}
+
+.bagxpro-configurator__close:hover,
+.bagxpro-configurator__close:focus,
+.bagxpro-configurator__close:focus-visible {
+    background: #e5e5e5;
+    outline: none;
+    box-shadow: none;
+}
+
+.bagxpro-configurator__body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0 24px;
+}
+
+.bagxpro-configurator__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.bagxpro-configurator__item {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.bagxpro-configurator__link {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 24px;
+    color: inherit;
+    text-decoration: none;
+    transition: background 0.2s ease;
+}
+
+.bagxpro-configurator__link:hover,
+.bagxpro-configurator__link:focus-visible {
+    background: rgba(234, 185, 51, 0.12);
+    outline: none;
+    text-decoration: none;
+}
+
+.bagxpro-configurator__link:hover .bagxpro-configurator__name,
+.bagxpro-configurator__link:focus-visible .bagxpro-configurator__name {
+    color: #eab933;
+}
+
+.bagxpro-configurator__thumb {
+    flex: 0 0 72px;
+    width: 72px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f8f8;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.bagxpro-configurator__thumb img {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
+.bagxpro-configurator__content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.bagxpro-configurator__name {
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.25;
+    transition: color 0.2s ease;
+}
+
+.bagxpro-configurator__desc {
+    font-size: 14px;
+    line-height: 1.45;
+    color: rgba(0, 0, 0, 0.65);
+}
+
+.bagxpro-configurator__empty {
+    margin: 24px;
+    font-size: 15px;
+    color: rgba(0, 0, 0, 0.65);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bagxpro-configurator__overlay,
+    .bagxpro-configurator__panel {
+        transition: none;
     }
 }
 

@@ -39,7 +39,7 @@
             </div>
 
             <div class="col-sm-3 col-3 text-right">
-                <a href="" class="button primary">CONFIGURER MON PRODUITS  +</a>
+                <a href="#modal-configurator" class="button primary">CONFIGURER MON PRODUITS  +</a>
             </div>
         </div>
     </div>

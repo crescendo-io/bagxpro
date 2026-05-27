@@ -67,6 +67,7 @@
 <?php
 wp_body_open();
 bagxpro_render_page_loader();
+bagxpro_render_configurator_sidebar();
 
 $optionMenu = get_field('option_menu_style', 'option');
 

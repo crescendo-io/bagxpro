@@ -5,6 +5,7 @@ require_once get_stylesheet_directory() . '/inc/bagxpro-produit-form-mailjet.php
 require_once get_stylesheet_directory() . '/inc/acf-front-page.php';
 require_once get_stylesheet_directory() . '/inc/acf-list-products.php';
 require_once get_stylesheet_directory() . '/inc/bagxpro-page-loader.php';
+require_once get_stylesheet_directory() . '/inc/bagxpro-configurator-sidebar.php';
 
 add_action( 'after_setup_theme', 'bagxpro_theme_support' );
 function bagxpro_theme_support() {
@@ -222,6 +223,15 @@ function wpm_enqueue_styles(){
 		get_stylesheet_directory_uri() . '/js/bagxpro-scroll-reveal.js',
 		array(),
 		file_exists( $scroll_reveal_js ) ? filemtime( $scroll_reveal_js ) : null,
+		true
+	);
+
+	$configurator_sidebar_js = get_stylesheet_directory() . '/js/bagxpro-configurator-sidebar.js';
+	wp_enqueue_script(
+		'bagxpro-configurator-sidebar',
+		get_stylesheet_directory_uri() . '/js/bagxpro-configurator-sidebar.js',
+		array(),
+		file_exists( $configurator_sidebar_js ) ? filemtime( $configurator_sidebar_js ) : null,
 		true
 	);
 
