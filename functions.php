@@ -206,6 +206,17 @@ function wpm_enqueue_styles(){
         )
     );
 
+	if ( is_front_page() ) {
+		$home_stats_js = get_stylesheet_directory() . '/js/home-stats-count.js';
+		wp_enqueue_script(
+			'bagxpro-home-stats-count',
+			get_stylesheet_directory_uri() . '/js/home-stats-count.js',
+			array(),
+			file_exists( $home_stats_js ) ? filemtime( $home_stats_js ) : null,
+			true
+		);
+	}
+
 	if ( is_singular( 'produit' ) ) {
 		$css_path = get_stylesheet_directory() . '/styles/product-bag.css';
 		wp_enqueue_style(

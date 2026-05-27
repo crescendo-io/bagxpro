@@ -180,6 +180,17 @@ if ( is_string( $bagxpro_lp_title ) && '' !== trim( $bagxpro_lp_title ) ) {
 if ( is_string( $bagxpro_lp_text ) && '' !== trim( $bagxpro_lp_text ) ) {
 	$bagxpro_list_args['intro_text'] = $bagxpro_lp_text;
 }
+
+/**
+ * Extrait un entier depuis un chiffre affiché (ex. "3 000" → 3000).
+ *
+ * @param mixed $raw Valeur ACF / texte.
+ * @return int
+ */
+$bagxpro_stat_to_int = static function ( $raw ) {
+	$digits = preg_replace( '/\D/', '', (string) $raw );
+	return '' !== $digits ? (int) $digits : 0;
+};
 ?>
 
 <div class="strate-hero full home">
@@ -235,12 +246,12 @@ if ( is_string( $bagxpro_lp_text ) && '' !== trim( $bagxpro_lp_text ) ) {
 	</ul>
 </div>
 
-<div class="section-cards">
+<div class="section-cards" data-bagxpro-stats>
 	<div class="container">
 		<div class="row">
 			<div class="col-sm-3">
 				<div class="card-border">
-					<div class="card-number"><?php echo esc_html( $bagxpro_s1['number'] ); ?></div>
+					<div class="card-number" data-bagxpro-count="<?php echo esc_attr( (string) $bagxpro_stat_to_int( $bagxpro_s1['number'] ) ); ?>">0</div>
 					<div class="card-label"><?php echo esc_html( $bagxpro_s1['label'] ); ?></div>
 					<div class="card-description">
 						<?php echo esc_html( $bagxpro_s1['description'] ); ?>
@@ -249,7 +260,7 @@ if ( is_string( $bagxpro_lp_text ) && '' !== trim( $bagxpro_lp_text ) ) {
 			</div>
 			<div class="col-sm-3">
 				<div class="card-border">
-					<div class="card-number"><?php echo esc_html( $bagxpro_s2['number'] ); ?></div>
+					<div class="card-number" data-bagxpro-count="<?php echo esc_attr( (string) $bagxpro_stat_to_int( $bagxpro_s2['number'] ) ); ?>">0</div>
 					<div class="card-label"><?php echo esc_html( $bagxpro_s2['label'] ); ?></div>
 					<div class="card-description">
 						<?php echo esc_html( $bagxpro_s2['description'] ); ?>
@@ -264,7 +275,7 @@ if ( is_string( $bagxpro_lp_text ) && '' !== trim( $bagxpro_lp_text ) ) {
 			</div>
 			<div class="col-sm-3">
 				<div class="card-border">
-					<div class="card-number"><?php echo esc_html( $bagxpro_s3['number'] ); ?></div>
+					<div class="card-number" data-bagxpro-count="<?php echo esc_attr( (string) $bagxpro_stat_to_int( $bagxpro_s3['number'] ) ); ?>">0</div>
 					<div class="card-label"><?php echo esc_html( $bagxpro_s3['label'] ); ?></div>
 					<div class="card-description">
 						<?php echo esc_html( $bagxpro_s3['description'] ); ?>
