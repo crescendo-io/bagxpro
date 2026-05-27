@@ -2,11 +2,19 @@
 	'use strict';
 
 	var loader = document.getElementById('bagxpro-page-loader');
-	if (!loader) {
-		return;
+	var body = document.body;
+
+	function markLoaderDone() {
+		if (body) {
+			body.classList.add('bagxpro-loader-done');
+		}
+		document.dispatchEvent(new CustomEvent('bagxpro:loader-done'));
 	}
 
-	var body = document.body;
+	if (!loader) {
+		markLoaderDone();
+		return;
+	}
 	var minDisplayMs = 550;
 	var maxDisplayMs = 8000;
 	var startedAt = Date.now();
@@ -23,10 +31,30 @@
 			body.classList.remove('bagxpro-is-loading');
 		}
 		window.setTimeout(function () {
+			if (body) {
+				body.classList.add('bagxpro-loader-done');
+			}
+			document.dispatchEvent(new CustomEvent('bagxpro:loader-done'));
 			if (loader.parentNode) {
 				loader.parentNode.removeChild(loader);
 			}
 		}, fadeMs);
+	}
+
+	function finishImmediately() {
+		if (finished) {
+			return;
+		}
+		finished = true;
+		loader.classList.add('is-hidden');
+		if (body) {
+			body.classList.remove('bagxpro-is-loading');
+			body.classList.add('bagxpro-loader-done');
+		}
+		document.dispatchEvent(new CustomEvent('bagxpro:loader-done'));
+		if (loader.parentNode) {
+			loader.parentNode.removeChild(loader);
+		}
 	}
 
 	function finishAfterMinDelay() {
@@ -36,7 +64,7 @@
 	}
 
 	if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-		finish();
+		finishImmediately();
 		return;
 	}
 

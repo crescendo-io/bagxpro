@@ -748,7 +748,7 @@ button{
     clip-path: polygon(0 90%, 100% 0%, 100% 100%, 0% 100%);
 }
 
-/* Hero home — entrée en cascade (titre → accroche → CTA → sac → placeholder) */
+/* Hero home — entrée en cascade après disparition du loader */
 @keyframes bagxpro-hero-rise-fade {
     from {
         opacity: 0;
@@ -777,50 +777,72 @@ button{
 .strate-hero.home .container-bag-home .bag-img,
 .strate-hero.home .container-bag-home .placeholder {
     opacity: 0;
+}
+
+@media (scripting: none) {
+    .strate-hero.home .strate-hero_inner h1,
+    .strate-hero.home .strate-hero_inner > p,
+    .strate-hero.home .strate-hero_inner .container-buttons,
+    .strate-hero.home .container-bag-home .bag-img,
+    .strate-hero.home .container-bag-home .placeholder {
+        opacity: 1;
+        transform: none;
+    }
+
+    .strate-hero.home .container-bag-home .placeholder {
+        transform: translate(-50%, -50%);
+    }
+}
+
+body.bagxpro-loader-done .strate-hero.home .strate-hero_inner h1,
+body.bagxpro-loader-done .strate-hero.home .strate-hero_inner > p,
+body.bagxpro-loader-done .strate-hero.home .strate-hero_inner .container-buttons,
+body.bagxpro-loader-done .strate-hero.home .container-bag-home .bag-img,
+body.bagxpro-loader-done .strate-hero.home .container-bag-home .placeholder {
     animation-duration: 1.05s;
     animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
     animation-fill-mode: both;
     will-change: transform, opacity;
 }
 
-.strate-hero.home .strate-hero_inner h1 {
+body.bagxpro-loader-done .strate-hero.home .strate-hero_inner h1 {
     animation-name: bagxpro-hero-rise-fade;
     animation-delay: 0.15s;
 }
 
-.strate-hero.home .strate-hero_inner > p {
+body.bagxpro-loader-done .strate-hero.home .strate-hero_inner > p {
     animation-name: bagxpro-hero-rise-fade;
     animation-delay: 0.38s;
 }
 
-.strate-hero.home .strate-hero_inner .container-buttons {
+body.bagxpro-loader-done .strate-hero.home .strate-hero_inner .container-buttons {
     animation-name: bagxpro-hero-rise-fade;
     animation-delay: 0.58s;
 }
 
-.strate-hero.home .container-bag-home .bag-img {
+body.bagxpro-loader-done .strate-hero.home .container-bag-home .bag-img {
     animation-name: bagxpro-hero-rise-fade;
     animation-delay: 0.82s;
 }
 
-.strate-hero.home .container-bag-home .placeholder {
+body.bagxpro-loader-done .strate-hero.home .container-bag-home .placeholder {
     animation-name: bagxpro-hero-rise-fade-placeholder;
     animation-delay: 1.05s;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .strate-hero.home .strate-hero_inner h1,
-    .strate-hero.home .strate-hero_inner > p,
-    .strate-hero.home .strate-hero_inner .container-buttons,
-    .strate-hero.home .container-bag-home .bag-img,
-    .strate-hero.home .container-bag-home .placeholder {
+    body.bagxpro-loader-done .strate-hero.home .strate-hero_inner h1,
+    body.bagxpro-loader-done .strate-hero.home .strate-hero_inner > p,
+    body.bagxpro-loader-done .strate-hero.home .strate-hero_inner .container-buttons,
+    body.bagxpro-loader-done .strate-hero.home .container-bag-home .bag-img,
+    body.bagxpro-loader-done .strate-hero.home .container-bag-home .placeholder {
         animation: none;
         opacity: 1;
         transform: none;
         will-change: auto;
     }
 
-    .strate-hero.home .container-bag-home .placeholder {
+    body.bagxpro-loader-done .strate-hero.home .container-bag-home .placeholder {
         transform: translate(-50%, -50%);
     }
 }
