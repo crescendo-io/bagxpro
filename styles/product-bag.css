@@ -470,14 +470,14 @@
 	box-shadow: 0 0 0 3px rgba(234, 185, 51, 0.25);
 }
 
-/* Impression 2 / 4 faces */
-.bagxpro-field--print-faces {
-	margin: 0 0 24px;
+/* Impression 2 / 4 faces (sous le select quantité) */
+.bagxpro-field--quantity .bagxpro-field--print-faces {
+	margin: 24px 0 20px;
 	padding: 0;
 	border: 0;
 }
 
-.bagxpro-field--print-faces .bagxpro-field__label {
+.bagxpro-field--quantity .bagxpro-field--print-faces .bagxpro-field__label {
 	display: block;
 	margin-bottom: 10px;
 	padding: 0;
@@ -520,13 +520,26 @@
 	color: var(--bagxpro-sim-text);
 }
 
-.bagxpro-radio:has(.bagxpro-radio__input:checked) .bagxpro-radio__label {
-	font-weight: 600;
-}
-
 .bagxpro-radio__input:focus-visible {
 	outline: 2px solid var(--bagxpro-sim-gold, #eab933);
 	outline-offset: 2px;
+}
+
+/* Quantité libre (affichée si option « libre ») */
+.bagxpro-quantity-custom {
+	margin-top: 12px;
+}
+
+.bagxpro-quantity-custom__label {
+	display: block;
+	margin-bottom: 8px;
+	font-size: 14px;
+	font-weight: 500;
+	color: var(--bagxpro-sim-text);
+}
+
+.bagxpro-quantity-custom__input {
+	max-width: 220px;
 }
 
 /* Contact (nom, prénom, e-mail, téléphone) */
@@ -634,7 +647,11 @@
 /* Prix dans les options : accent partiel impossible en natif — chaîne unique */
 
 .bagxpro-btn-order {
-	display: block;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
 	width: 100%;
 	margin-top: 0;
 	margin-bottom: 0;
@@ -644,13 +661,26 @@
 	background: var(--bagxpro-sim-gold);
 	color: #fff;
 	font-family: inherit;
+	cursor: pointer;
+	box-shadow: 0 4px 14px rgba(234, 185, 51, 0.4);
+	transition: background 0.2s, transform 0.15s;
+}
+
+.bagxpro-btn-order__main {
 	font-size: 15px;
 	font-weight: 700;
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
-	cursor: pointer;
-	box-shadow: 0 4px 14px rgba(234, 185, 51, 0.4);
-	transition: background 0.2s, transform 0.15s;
+	line-height: 1.2;
+}
+
+.bagxpro-btn-order__sub {
+	font-size: 13px;
+	font-weight: 500;
+	letter-spacing: 0.02em;
+	text-transform: none;
+	line-height: 1.2;
+	opacity: 0.95;
 }
 
 .bagxpro-btn-order:hover {

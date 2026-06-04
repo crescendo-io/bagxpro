@@ -226,6 +226,29 @@
 	/**
 	 * Capture .bagxpro-bag-preview (html2canvas) en JPEG puis soumission réelle sans reboucler sur submit.
 	 */
+	function initQuantityCustom(root) {
+		var select = root.querySelector('[data-bagxpro-quantity-select]');
+		var block = root.querySelector('#bagxpro-quantity-custom');
+		var input = root.querySelector('#bagxpro-quantity-custom-input');
+		if (!select || !block) {
+			return;
+		}
+
+		function sync() {
+			var isLibre = select.value === 'libre';
+			block.hidden = !isLibre;
+			if (input) {
+				input.required = isLibre;
+				if (!isLibre) {
+					input.value = '';
+				}
+			}
+		}
+
+		select.addEventListener('change', sync);
+		sync();
+	}
+
 	function initPreviewMailCapture(root) {
 		var form = root.querySelector('.bagxpro-produit-form');
 		var preview = root.querySelector('#bagxpro-bag-preview') || root.querySelector('.bagxpro-bag-preview');
@@ -294,6 +317,7 @@
 		}
 		initLogo(root);
 		initStraps(root);
+		initQuantityCustom(root);
 		initPreviewMailCapture(root);
 	}
 

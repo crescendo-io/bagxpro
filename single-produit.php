@@ -130,7 +130,7 @@ while ( have_posts() ) :
 						</div>
 					<?php elseif ( isset( $_GET['commande'] ) && 'incomplet' === sanitize_text_field( wp_unslash( $_GET['commande'] ) ) ) : ?>
 						<div class="bagxpro-notice bagxpro-notice--error" role="alert">
-							<?php esc_html_e( 'Merci de renseigner tous les champs obligatoires (société, nom, prénom, e-mail, type d’impression).', 'bagxpro' ); ?>
+							<?php esc_html_e( 'Merci de renseigner tous les champs obligatoires (société, nom, prénom, e-mail, quantité, type d’impression).', 'bagxpro' ); ?>
 						</div>
 					<?php elseif ( isset( $_GET['commande'] ) && 'nonce' === sanitize_text_field( wp_unslash( $_GET['commande'] ) ) ) : ?>
 						<div class="bagxpro-notice bagxpro-notice--error" role="alert">
@@ -256,51 +256,83 @@ while ( have_posts() ) :
 						</div>
 					</div>
 
-					<div class="bagxpro-field bagxpro-field--quantity">
-						<label class="bagxpro-field__label" for="bagxpro-quantity-select"><?php esc_html_e( 'Nombre de sacs', 'bagxpro' ); ?></label>
-						<div class="bagxpro-select-wrap">
-							<select id="bagxpro-quantity-select" class="bagxpro-select" name="bagxpro_quantity_tier">
-								<option value="100"><?php esc_html_e( '100 sacs (à partir de 120€ H.T)', 'bagxpro' ); ?></option>
-								<option value="500" selected><?php esc_html_e( '500 sacs (à partir de 400€ H.T)', 'bagxpro' ); ?></option>
-								<option value="1000"><?php esc_html_e( '1 000 sacs (sur devis)', 'bagxpro' ); ?></option>
-							</select>
-						</div>
-					</div>
-
 					<?php
+					$bagxpro_quantity_tier_options = function_exists( 'bagxpro_produit_quantity_tier_options' )
+						? bagxpro_produit_quantity_tier_options()
+						: array(
+							'500'  => __( '500 pièces', 'bagxpro' ),
+							'1000' => __( '1 000 pièces', 'bagxpro' ),
+							'libre'  => __( 'Quantité libre', 'bagxpro' ),
+						);
 					$bagxpro_print_faces_options = function_exists( 'bagxpro_produit_print_faces_options' )
 						? bagxpro_produit_print_faces_options()
 						: array(
 							'2' => __( 'Impression 2 faces', 'bagxpro' ),
 							'4' => __( 'Impression 4 faces', 'bagxpro' ),
 						);
+					$bagxpro_quantity_custom_min = max( 1, (int) apply_filters( 'bagxpro_produit_quantity_custom_min', 500 ) );
 					?>
-					<fieldset class="bagxpro-field bagxpro-field--print-faces">
-						<legend class="bagxpro-field__label"><?php esc_html_e( 'Type d’impression', 'bagxpro' ); ?></legend>
-						<div class="bagxpro-radio-group" role="radiogroup">
-							<?php
-							$print_faces_first = true;
-							foreach ( $bagxpro_print_faces_options as $faces_value => $faces_label ) :
-								$faces_id = 'bagxpro-print-faces-' . esc_attr( $faces_value );
-								?>
-								<label class="bagxpro-radio" for="<?php echo esc_attr( $faces_id ); ?>">
-									<input
-										type="radio"
-										class="bagxpro-radio__input"
-										name="bagxpro_print_faces"
-										id="<?php echo esc_attr( $faces_id ); ?>"
-										value="<?php echo esc_attr( $faces_value ); ?>"
-										<?php checked( $print_faces_first ); ?>
-										required
-									>
-									<span class="bagxpro-radio__label"><?php echo esc_html( $faces_label ); ?></span>
-								</label>
-								<?php
-								$print_faces_first = false;
-							endforeach;
-							?>
+					<div class="bagxpro-field bagxpro-field--quantity">
+						<label class="bagxpro-field__label" for="bagxpro-quantity-select"><?php esc_html_e( 'Nombre de sacs', 'bagxpro' ); ?></label>
+						<div class="bagxpro-select-wrap">
+							<select
+								id="bagxpro-quantity-select"
+								class="bagxpro-select"
+								name="bagxpro_quantity_tier"
+								data-bagxpro-quantity-select
+								required
+							>
+								<?php foreach ( $bagxpro_quantity_tier_options as $tier_value => $tier_label ) : ?>
+									<option value="<?php echo esc_attr( $tier_value ); ?>"<?php selected( $tier_value, '500' ); ?>>
+										<?php echo esc_html( $tier_label ); ?>
+									</option>
+								<?php endforeach; ?>
+							</select>
 						</div>
-					</fieldset>
+
+						<fieldset class="bagxpro-field bagxpro-field--print-faces">
+							<legend class="bagxpro-field__label"><?php esc_html_e( 'Type d’impression', 'bagxpro' ); ?></legend>
+							<div class="bagxpro-radio-group" role="radiogroup" aria-label="<?php esc_attr_e( 'Type d’impression', 'bagxpro' ); ?>">
+								<?php
+								$print_faces_first = true;
+								foreach ( $bagxpro_print_faces_options as $faces_value => $faces_label ) :
+									$faces_id = 'bagxpro-print-faces-' . esc_attr( $faces_value );
+									?>
+									<label class="bagxpro-radio" for="<?php echo esc_attr( $faces_id ); ?>">
+										<input
+											type="radio"
+											class="bagxpro-radio__input"
+											name="bagxpro_print_faces"
+											id="<?php echo esc_attr( $faces_id ); ?>"
+											value="<?php echo esc_attr( $faces_value ); ?>"
+											<?php checked( $print_faces_first ); ?>
+											required
+										>
+										<span class="bagxpro-radio__label"><?php echo esc_html( $faces_label ); ?></span>
+									</label>
+									<?php
+									$print_faces_first = false;
+								endforeach;
+								?>
+							</div>
+						</fieldset>
+
+						<div class="bagxpro-quantity-custom" id="bagxpro-quantity-custom" hidden>
+							<label class="bagxpro-quantity-custom__label" for="bagxpro-quantity-custom-input">
+								<?php esc_html_e( 'Quantité souhaitée (pièces)', 'bagxpro' ); ?>
+							</label>
+							<input
+								type="number"
+								class="bagxpro-input bagxpro-quantity-custom__input"
+								id="bagxpro-quantity-custom-input"
+								name="bagxpro_quantity_custom"
+								min="<?php echo (int) $bagxpro_quantity_custom_min; ?>"
+								step="1"
+								inputmode="numeric"
+								placeholder="<?php echo esc_attr( sprintf( /* translators: %d: minimum pieces */ __( 'À partir de %d', 'bagxpro' ), $bagxpro_quantity_custom_min ) ); ?>"
+							>
+						</div>
+					</div>
 
 					<div class="bagxpro-produit-panel__contact" data-bagxpro-contact>
 						<div class="bagxpro-field">
@@ -388,7 +420,8 @@ while ( have_posts() ) :
 					</div>
 
 					<button type="submit" class="bagxpro-btn-order">
-						<?php esc_html_e( 'COMMANDER MON BIG BAG', 'bagxpro' ); ?>
+						<span class="bagxpro-btn-order__main"><?php esc_html_e( 'Demander un devis', 'bagxpro' ); ?></span>
+						<span class="bagxpro-btn-order__sub"><?php esc_html_e( 'Devis sous 24h', 'bagxpro' ); ?></span>
 					</button>
 					</form>
 

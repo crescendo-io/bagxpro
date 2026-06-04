@@ -76,6 +76,83 @@ function bagxpro_produit_get_strap_palette( $product_id ) {
 }
 
 /**
+ * Options du select quantité (fiche produit, valeurs fixes — sans impression).
+ *
+ * @return array<string, string>
+ */
+function bagxpro_produit_quantity_tier_options() {
+	$options = array(
+		'500'  => __( '500 pièces', 'bagxpro' ),
+		'1000' => __( '1 000 pièces', 'bagxpro' ),
+		'libre'  => __( 'Quantité libre', 'bagxpro' ),
+	);
+
+	/**
+	 * Filtre les lignes du select « Nombre de sacs ».
+	 *
+	 * @param array<string, string> $options Clé => libellé affiché.
+	 */
+	return (array) apply_filters( 'bagxpro_produit_quantity_tier_options', $options );
+}
+
+/**
+ * Valide la valeur POST du select quantité.
+ *
+ * @param string $value Valeur brute.
+ * @return string Clé valide ou chaîne vide.
+ */
+function bagxpro_produit_sanitize_quantity_tier( $value ) {
+	$value = sanitize_text_field( (string) $value );
+	$opts  = bagxpro_produit_quantity_tier_options();
+	return isset( $opts[ $value ] ) ? $value : '';
+}
+
+/**
+ * Décompose quantité (select), impression (radios) et libellés pour e-mail / commande.
+ *
+ * @param string $tier_key    Clé du select (500, 1000, libre).
+ * @param string $custom_qty  Quantité saisie si « libre ».
+ * @param string $print_faces « 2 » ou « 4 ».
+ * @return array{
+ *   tier_key: string,
+ *   tier_label: string,
+ *   qty_base: string,
+ *   print_faces: string,
+ *   print_faces_label: string,
+ *   quantity_custom: string
+ * }
+ */
+function bagxpro_produit_resolve_quantity_choice( $tier_key, $custom_qty = '', $print_faces = '' ) {
+	$tier_key     = sanitize_text_field( (string) $tier_key );
+	$custom_qty   = sanitize_text_field( (string) $custom_qty );
+	$print_faces  = bagxpro_produit_sanitize_print_faces( $print_faces );
+	$options      = bagxpro_produit_quantity_tier_options();
+	$label        = isset( $options[ $tier_key ] ) ? $options[ $tier_key ] : '—';
+
+	$out = array(
+		'tier_key'          => $tier_key,
+		'tier_label'        => $label,
+		'qty_base'          => $tier_key,
+		'print_faces'       => $print_faces,
+		'print_faces_label' => bagxpro_produit_print_faces_label( $print_faces ),
+		'quantity_custom'   => '',
+	);
+
+	if ( 'libre' === $tier_key ) {
+		$out['quantity_custom'] = $custom_qty;
+		if ( '' !== $custom_qty ) {
+			$out['tier_label'] = sprintf(
+				/* translators: %s: number of bags */
+				__( 'Quantité libre : %s pièces', 'bagxpro' ),
+				$custom_qty
+			);
+		}
+	}
+
+	return $out;
+}
+
+/**
  * Options d’impression (2 ou 4 faces) pour le formulaire produit.
  *
  * @return array<string, string> Clé « 2 » ou « 4 » => libellé traduit.
@@ -423,6 +500,7 @@ function bagxpro_create_commande_record( array $args ) {
 		'tier_label'        => '',
 		'print_faces'       => '',
 		'print_faces_label' => '',
+		'quantity_custom'   => '',
 		'strap_idx'         => '',
 		'strap_lbl'     => '',
 		'text_body'     => '',
@@ -479,6 +557,7 @@ function bagxpro_create_commande_record( array $args ) {
 	update_post_meta( $post_id, '_bagxpro_quantity_label', $args['tier_label'] );
 	update_post_meta( $post_id, '_bagxpro_print_faces', $args['print_faces'] );
 	update_post_meta( $post_id, '_bagxpro_print_faces_label', $args['print_faces_label'] );
+	update_post_meta( $post_id, '_bagxpro_quantity_custom', $args['quantity_custom'] );
 	update_post_meta( $post_id, '_bagxpro_strap_index', $args['strap_idx'] );
 	update_post_meta( $post_id, '_bagxpro_strap_label', $args['strap_lbl'] );
 	update_post_meta( $post_id, '_bagxpro_has_logo', ! empty( $args['has_logo'] ) ? '1' : '0' );
@@ -594,15 +673,19 @@ function bagxpro_handle_produit_form_submit() {
 	$prenom    = isset( $_POST['bagxpro_prenom'] ) ? sanitize_text_field( wp_unslash( $_POST['bagxpro_prenom'] ) ) : '';
 	$email     = isset( $_POST['bagxpro_email'] ) ? sanitize_email( wp_unslash( $_POST['bagxpro_email'] ) ) : '';
 	$telephone = isset( $_POST['bagxpro_telephone'] ) ? sanitize_text_field( wp_unslash( $_POST['bagxpro_telephone'] ) ) : '';
-	$tier        = isset( $_POST['bagxpro_quantity_tier'] ) ? sanitize_text_field( wp_unslash( $_POST['bagxpro_quantity_tier'] ) ) : '';
-	$print_faces = isset( $_POST['bagxpro_print_faces'] ) ? bagxpro_produit_sanitize_print_faces( wp_unslash( $_POST['bagxpro_print_faces'] ) ) : '';
+	$tier_key       = isset( $_POST['bagxpro_quantity_tier'] ) ? bagxpro_produit_sanitize_quantity_tier( wp_unslash( $_POST['bagxpro_quantity_tier'] ) ) : '';
+	$print_faces    = isset( $_POST['bagxpro_print_faces'] ) ? bagxpro_produit_sanitize_print_faces( wp_unslash( $_POST['bagxpro_print_faces'] ) ) : '';
+	$custom_qty_raw = isset( $_POST['bagxpro_quantity_custom'] ) ? wp_unslash( $_POST['bagxpro_quantity_custom'] ) : '';
+	$custom_qty     = '' !== $custom_qty_raw && is_numeric( $custom_qty_raw ) ? (string) absint( $custom_qty_raw ) : '';
 
-	$allowed_tiers = array( '100', '500', '1000' );
-	if ( ! in_array( $tier, $allowed_tiers, true ) ) {
-		$tier = '';
+	if ( 'libre' === $tier_key ) {
+		$custom_min = max( 1, (int) apply_filters( 'bagxpro_produit_quantity_custom_min', 500 ) );
+		if ( '' === $custom_qty || (int) $custom_qty < $custom_min ) {
+			$tier_key = '';
+		}
 	}
 
-	if ( '' === $societe || '' === $nom || '' === $prenom || ! is_email( $email ) || '' === $print_faces ) {
+	if ( '' === $societe || '' === $nom || '' === $prenom || ! is_email( $email ) || '' === $tier_key || '' === $print_faces ) {
 		wp_safe_redirect( add_query_arg( 'commande', 'incomplet', get_permalink( $product_id ) ) );
 		exit;
 	}
@@ -630,14 +713,11 @@ function bagxpro_handle_produit_form_submit() {
 	$strap_idx = (string) $strap_i;
 	$strap_lbl = isset( $palette['labels'][ $strap_i ] ) ? $palette['labels'][ $strap_i ] : $palette['labels'][0];
 
-	$product_title = get_the_title( $product_id );
-	$tier_labels   = array(
-		'100'  => __( '100 sacs (à partir de 120€ H.T)', 'bagxpro' ),
-		'500'  => __( '500 sacs (à partir de 400€ H.T)', 'bagxpro' ),
-		'1000' => __( '1 000 sacs (sur devis)', 'bagxpro' ),
-	);
-	$tier_label         = isset( $tier_labels[ $tier ] ) ? $tier_labels[ $tier ] : ( $tier ? $tier : '—' );
-	$print_faces_label  = bagxpro_produit_print_faces_label( $print_faces );
+	$product_title   = get_the_title( $product_id );
+	$quantity_choice   = bagxpro_produit_resolve_quantity_choice( $tier_key, $custom_qty, $print_faces );
+	$tier_label        = $quantity_choice['tier_label'];
+	$print_faces       = $quantity_choice['print_faces'];
+	$print_faces_label = $quantity_choice['print_faces_label'];
 
 	$lines_text = array(
 		__( 'Produit', 'bagxpro' ) . ': ' . $product_title . ' (ID ' . $product_id . ')',
@@ -707,10 +787,11 @@ function bagxpro_handle_produit_form_submit() {
 			'prenom'        => $prenom,
 			'email'         => $email,
 			'telephone'     => $telephone,
-			'tier'              => $tier,
+			'tier'              => $tier_key,
 			'tier_label'        => $tier_label,
 			'print_faces'       => $print_faces,
 			'print_faces_label' => $print_faces_label,
+			'quantity_custom'   => $quantity_choice['quantity_custom'],
 			'strap_idx'         => $strap_idx,
 			'strap_lbl'     => $strap_lbl,
 			'text_body'     => $text_body,
