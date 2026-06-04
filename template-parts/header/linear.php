@@ -8,7 +8,7 @@
 
 <div class="bagxpro-site-header">
 <div class="sentence-header">
-    Profitez de -15% sur vos big bags personnalisés pour toute commande en volume. Qualité pro, impression sur mesure et livraison rapide.
+Demandez votre devis pour vos Big Bags personnalisés, qualité professionnelle, fabrication sur mesure. 
 </div>
 <header class="burger linear">
     <div class="container-fluid">

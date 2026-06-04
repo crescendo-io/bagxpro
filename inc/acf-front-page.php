@@ -130,10 +130,11 @@ function bagxpro_register_acf_front_page_fields() {
 					'type'       => 'group',
 					'sub_fields' => array(
 						array(
-							'key'   => 'field_bagxpro_home_s1_num',
-							'label' => __( 'Chiffre', 'bagxpro' ),
-							'name'  => 'number',
-							'type'  => 'text',
+							'key'           => 'field_bagxpro_home_s1_num',
+							'label'         => __( 'Chiffre', 'bagxpro' ),
+							'name'          => 'number',
+							'type'          => 'text',
+							'instructions'  => __( 'Ex. : 1500 € — le nombre sera animé, le suffixe (€, %, +…) reste affiché.', 'bagxpro' ),
 						),
 						array(
 							'key'   => 'field_bagxpro_home_s1_lab',
@@ -301,4 +302,50 @@ function bagxpro_register_acf_front_page_fields() {
 			'active'                => true,
 		)
 	);
+}
+
+/**
+ * Sépare chiffre et suffixe (ex. "1 500 €" → value 1500, suffix "€").
+ *
+ * @param mixed $raw Valeur ACF.
+ * @return array{value: int, suffix: string}
+ */
+function bagxpro_parse_stat_number( $raw ) {
+	$raw    = trim( (string) $raw );
+	$result = array(
+		'value'  => 0,
+		'suffix' => '',
+	);
+
+	if ( '' === $raw ) {
+		return $result;
+	}
+
+	if ( preg_match( '/^([\d\s.,]+)\s*(.*)$/us', $raw, $matches ) ) {
+		$digits = preg_replace( '/\D/', '', $matches[1] );
+		if ( '' !== $digits ) {
+			$result['value'] = (int) $digits;
+		}
+		$result['suffix'] = $matches[2];
+	}
+
+	return $result;
+}
+
+/**
+ * Affiche le bloc chiffre animé (nombre + suffixe type €).
+ *
+ * @param mixed $raw Valeur ACF du champ « Chiffre ».
+ */
+function bagxpro_render_card_number( $raw ) {
+	$parsed = bagxpro_parse_stat_number( $raw );
+	?>
+	<div class="card-number" data-bagxpro-count="<?php echo esc_attr( (string) $parsed['value'] ); ?>"<?php echo '' !== $parsed['suffix'] ? ' data-bagxpro-suffix="' . esc_attr( $parsed['suffix'] ) . '"' : ''; ?>>
+		<span class="card-number__value">0</span><?php
+		if ( '' !== $parsed['suffix'] ) :
+			?><span class="card-number__suffix"><?php echo esc_html( $parsed['suffix'] ); ?></span><?php
+		endif;
+		?>
+	</div>
+	<?php
 }

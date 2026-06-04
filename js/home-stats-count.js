@@ -1,12 +1,19 @@
 (function () {
 	'use strict';
 
+	var COUNT_DURATION_MS = 3800;
+	var COUNT_STAGGER_MS = 180;
+
 	function parseTarget(el) {
 		var raw = el.getAttribute('data-bagxpro-count');
 		if (!raw) {
 			return NaN;
 		}
 		return parseInt(raw, 10);
+	}
+
+	function getValueEl(el) {
+		return el.querySelector('.card-number__value') || el;
 	}
 
 	function formatNumber(n) {
@@ -22,8 +29,10 @@
 	}
 
 	function animateCount(el, target, duration) {
+		var valueEl = getValueEl(el);
+
 		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-			el.textContent = formatNumber(target);
+			valueEl.textContent = formatNumber(target);
 			return;
 		}
 
@@ -35,11 +44,11 @@
 			}
 			var progress = Math.min((ts - startTs) / duration, 1);
 			var value = Math.round(easeOutCubic(progress) * target);
-			el.textContent = formatNumber(value);
+			valueEl.textContent = formatNumber(value);
 			if (progress < 1) {
 				window.requestAnimationFrame(step);
 			} else {
-				el.textContent = formatNumber(target);
+				valueEl.textContent = formatNumber(target);
 			}
 		}
 
@@ -72,8 +81,8 @@
 						return;
 					}
 					window.setTimeout(function () {
-						animateCount(el, target, 2200);
-					}, index * 140);
+						animateCount(el, target, COUNT_DURATION_MS);
+					}, index * COUNT_STAGGER_MS);
 				})(cells[i], i);
 			}
 		}

@@ -50,7 +50,12 @@ function bagxpro_produit_get_strap_palette( $product_id ) {
 		$couleurs_acf = get_field( 'product_colors', $product_id );
 		if ( ! empty( $couleurs_acf ) && is_array( $couleurs_acf ) ) {
 			foreach ( $couleurs_acf as $i => $row ) {
-				$lbl = isset( $row['product_color_label'] ) ? (string) $row['product_color_label'] : '';
+				$lbl = '';
+				if ( isset( $row['product_color_name'] ) && '' !== trim( (string) $row['product_color_name'] ) ) {
+					$lbl = (string) $row['product_color_name'];
+				} elseif ( isset( $row['product_color_label'] ) ) {
+					$lbl = (string) $row['product_color_label'];
+				}
 				$lbl = sanitize_text_field( $lbl );
 				if ( '' === $lbl ) {
 					$lbl = sprintf( /* translators: %d: color index */ __( 'Couleur %d', 'bagxpro' ), $i + 1 );
@@ -68,6 +73,41 @@ function bagxpro_produit_get_strap_palette( $product_id ) {
 		'labels' => $labels,
 		'count'  => count( $labels ),
 	);
+}
+
+/**
+ * Options d’impression (2 ou 4 faces) pour le formulaire produit.
+ *
+ * @return array<string, string> Clé « 2 » ou « 4 » => libellé traduit.
+ */
+function bagxpro_produit_print_faces_options() {
+	return array(
+		'2' => __( 'Impression 2 faces', 'bagxpro' ),
+		'4' => __( 'Impression 4 faces', 'bagxpro' ),
+	);
+}
+
+/**
+ * Valide et normalise la valeur POST du type d’impression.
+ *
+ * @param string $value Valeur brute.
+ * @return string « 2 », « 4 » ou chaîne vide si invalide.
+ */
+function bagxpro_produit_sanitize_print_faces( $value ) {
+	$value = sanitize_text_field( (string) $value );
+	$opts  = bagxpro_produit_print_faces_options();
+	return isset( $opts[ $value ] ) ? $value : '';
+}
+
+/**
+ * Libellé affiché pour un type d’impression.
+ *
+ * @param string $value « 2 » ou « 4 ».
+ * @return string
+ */
+function bagxpro_produit_print_faces_label( $value ) {
+	$opts = bagxpro_produit_print_faces_options();
+	return isset( $opts[ $value ] ) ? $opts[ $value ] : '—';
 }
 
 /**
@@ -349,12 +389,15 @@ function send_mailjet_email( $to_email, $to_name, $subject, $html_content ) {
  * @param array $args {
  *   @type int    $product_id
  *   @type string $product_title
+ *   @type string $societe
  *   @type string $nom
  *   @type string $prenom
  *   @type string $email
  *   @type string $telephone
  *   @type string $tier
  *   @type string $tier_label
+ *   @type string $print_faces
+ *   @type string $print_faces_label
  *   @type string $strap_idx
  *   @type string $strap_lbl
  *   @type string $text_body
@@ -371,13 +414,16 @@ function bagxpro_create_commande_record( array $args ) {
 	$defaults = array(
 		'product_id'    => 0,
 		'product_title' => '',
+		'societe'       => '',
 		'nom'           => '',
 		'prenom'        => '',
 		'email'         => '',
 		'telephone'     => '',
-		'tier'          => '',
-		'tier_label'    => '',
-		'strap_idx'     => '',
+		'tier'              => '',
+		'tier_label'        => '',
+		'print_faces'       => '',
+		'print_faces_label' => '',
+		'strap_idx'         => '',
 		'strap_lbl'     => '',
 		'text_body'     => '',
 		'has_logo'      => false,
@@ -424,12 +470,15 @@ function bagxpro_create_commande_record( array $args ) {
 	}
 
 	update_post_meta( $post_id, '_bagxpro_product_id', absint( $args['product_id'] ) );
+	update_post_meta( $post_id, '_bagxpro_societe', $args['societe'] );
 	update_post_meta( $post_id, '_bagxpro_nom', $args['nom'] );
 	update_post_meta( $post_id, '_bagxpro_prenom', $args['prenom'] );
 	update_post_meta( $post_id, '_bagxpro_email', $args['email'] );
 	update_post_meta( $post_id, '_bagxpro_telephone', $args['telephone'] );
 	update_post_meta( $post_id, '_bagxpro_quantity_tier', $args['tier'] );
 	update_post_meta( $post_id, '_bagxpro_quantity_label', $args['tier_label'] );
+	update_post_meta( $post_id, '_bagxpro_print_faces', $args['print_faces'] );
+	update_post_meta( $post_id, '_bagxpro_print_faces_label', $args['print_faces_label'] );
 	update_post_meta( $post_id, '_bagxpro_strap_index', $args['strap_idx'] );
 	update_post_meta( $post_id, '_bagxpro_strap_label', $args['strap_lbl'] );
 	update_post_meta( $post_id, '_bagxpro_has_logo', ! empty( $args['has_logo'] ) ? '1' : '0' );
@@ -540,18 +589,20 @@ function bagxpro_handle_produit_form_submit() {
 		exit;
 	}
 
+	$societe   = isset( $_POST['bagxpro_societe'] ) ? sanitize_text_field( wp_unslash( $_POST['bagxpro_societe'] ) ) : '';
 	$nom       = isset( $_POST['bagxpro_nom'] ) ? sanitize_text_field( wp_unslash( $_POST['bagxpro_nom'] ) ) : '';
 	$prenom    = isset( $_POST['bagxpro_prenom'] ) ? sanitize_text_field( wp_unslash( $_POST['bagxpro_prenom'] ) ) : '';
 	$email     = isset( $_POST['bagxpro_email'] ) ? sanitize_email( wp_unslash( $_POST['bagxpro_email'] ) ) : '';
 	$telephone = isset( $_POST['bagxpro_telephone'] ) ? sanitize_text_field( wp_unslash( $_POST['bagxpro_telephone'] ) ) : '';
-	$tier      = isset( $_POST['bagxpro_quantity_tier'] ) ? sanitize_text_field( wp_unslash( $_POST['bagxpro_quantity_tier'] ) ) : '';
+	$tier        = isset( $_POST['bagxpro_quantity_tier'] ) ? sanitize_text_field( wp_unslash( $_POST['bagxpro_quantity_tier'] ) ) : '';
+	$print_faces = isset( $_POST['bagxpro_print_faces'] ) ? bagxpro_produit_sanitize_print_faces( wp_unslash( $_POST['bagxpro_print_faces'] ) ) : '';
 
 	$allowed_tiers = array( '100', '500', '1000' );
 	if ( ! in_array( $tier, $allowed_tiers, true ) ) {
 		$tier = '';
 	}
 
-	if ( '' === $nom || '' === $prenom || ! is_email( $email ) ) {
+	if ( '' === $societe || '' === $nom || '' === $prenom || ! is_email( $email ) || '' === $print_faces ) {
 		wp_safe_redirect( add_query_arg( 'commande', 'incomplet', get_permalink( $product_id ) ) );
 		exit;
 	}
@@ -585,15 +636,18 @@ function bagxpro_handle_produit_form_submit() {
 		'500'  => __( '500 sacs (à partir de 400€ H.T)', 'bagxpro' ),
 		'1000' => __( '1 000 sacs (sur devis)', 'bagxpro' ),
 	);
-	$tier_label    = isset( $tier_labels[ $tier ] ) ? $tier_labels[ $tier ] : ( $tier ? $tier : '—' );
+	$tier_label         = isset( $tier_labels[ $tier ] ) ? $tier_labels[ $tier ] : ( $tier ? $tier : '—' );
+	$print_faces_label  = bagxpro_produit_print_faces_label( $print_faces );
 
 	$lines_text = array(
 		__( 'Produit', 'bagxpro' ) . ': ' . $product_title . ' (ID ' . $product_id . ')',
+		__( 'Nom de la société', 'bagxpro' ) . ': ' . $societe,
 		__( 'Nom', 'bagxpro' ) . ': ' . $nom,
 		__( 'Prénom', 'bagxpro' ) . ': ' . $prenom,
 		__( 'E-mail', 'bagxpro' ) . ': ' . $email,
 		__( 'Téléphone', 'bagxpro' ) . ': ' . $telephone,
 		__( 'Nombre de sacs', 'bagxpro' ) . ': ' . $tier_label,
+		__( 'Impression', 'bagxpro' ) . ': ' . $print_faces_label,
 		__( 'Couleur des sangles (index)', 'bagxpro' ) . ': ' . $strap_idx,
 		__( 'Couleur des sangles (libellé)', 'bagxpro' ) . ': ' . $strap_lbl,
 		__( 'Consentement RGPD (traitement des données, conservation sans limite de durée)', 'bagxpro' ) . ': ' . __( 'oui', 'bagxpro' ) . ' — ' . wp_date( __( 'd/m/Y à H:i', 'bagxpro' ) ),
@@ -605,11 +659,13 @@ function bagxpro_handle_produit_form_submit() {
 	$html_rows = '';
 	foreach ( array(
 		array( __( 'Produit', 'bagxpro' ), esc_html( $product_title ) . ' <small>(ID ' . (int) $product_id . ')</small>' ),
+		array( __( 'Nom de la société', 'bagxpro' ), esc_html( $societe ) ),
 		array( __( 'Nom', 'bagxpro' ), esc_html( $nom ) ),
 		array( __( 'Prénom', 'bagxpro' ), esc_html( $prenom ) ),
 		array( __( 'E-mail', 'bagxpro' ), '<a href="mailto:' . esc_attr( $email ) . '">' . esc_html( $email ) . '</a>' ),
 		array( __( 'Téléphone', 'bagxpro' ), esc_html( $telephone ) ),
 		array( __( 'Nombre de sacs', 'bagxpro' ), esc_html( $tier_label ) ),
+		array( __( 'Impression', 'bagxpro' ), esc_html( $print_faces_label ) ),
 		array( __( 'Couleur des sangles', 'bagxpro' ), esc_html( $strap_lbl ) . ' <small>(#' . esc_html( $strap_idx ) . ')</small>' ),
 		array(
 			__( 'Consentement RGPD', 'bagxpro' ),
@@ -646,13 +702,16 @@ function bagxpro_handle_produit_form_submit() {
 		array(
 			'product_id'    => $product_id,
 			'product_title' => $product_title,
+			'societe'       => $societe,
 			'nom'           => $nom,
 			'prenom'        => $prenom,
 			'email'         => $email,
 			'telephone'     => $telephone,
-			'tier'          => $tier,
-			'tier_label'    => $tier_label,
-			'strap_idx'     => $strap_idx,
+			'tier'              => $tier,
+			'tier_label'        => $tier_label,
+			'print_faces'       => $print_faces,
+			'print_faces_label' => $print_faces_label,
+			'strap_idx'         => $strap_idx,
 			'strap_lbl'     => $strap_lbl,
 			'text_body'     => $text_body,
 			'has_logo'      => $has_logo,

@@ -40,10 +40,19 @@ while ( have_posts() ) :
 			if ( ! $image_url ) {
 				$image_url = $bag_src;
 			}
+			$strap_label = isset( $row['product_color_label'] ) ? trim( (string) $row['product_color_label'] ) : '';
+			$color_name  = isset( $row['product_color_name'] ) ? trim( (string) $row['product_color_name'] ) : '';
+			if ( '' === $color_name ) {
+				$color_name = $strap_label;
+			}
+			if ( '' === $strap_label ) {
+				$strap_label = $color_name;
+			}
 			$product_color_rows[] = array(
 				'hex'   => $hex,
 				'url'   => $image_url,
-				'label' => isset( $row['product_color_label'] ) ? $row['product_color_label'] : '',
+				'label' => $strap_label,
+				'name'  => $color_name,
 			);
 		}
 	}
@@ -59,9 +68,14 @@ while ( have_posts() ) :
 
 	$first_strap_label = '';
 	if ( ! empty( $product_color_rows[0] ) ) {
-		$first_strap_label = ! empty( $product_color_rows[0]['label'] )
-			? $product_color_rows[0]['label']
-			: sprintf( /* translators: %d: index */ __( 'Couleur %d', 'bagxpro' ), 1 );
+		$first_row = $product_color_rows[0];
+		$first_strap_label = ! empty( $first_row['label'] ) ? $first_row['label'] : '';
+		if ( '' === $first_strap_label && ! empty( $first_row['name'] ) ) {
+			$first_strap_label = $first_row['name'];
+		}
+		if ( '' === $first_strap_label ) {
+			$first_strap_label = __( 'Couleur 1', 'bagxpro' );
+		}
 	}
 	?>
 
@@ -116,7 +130,7 @@ while ( have_posts() ) :
 						</div>
 					<?php elseif ( isset( $_GET['commande'] ) && 'incomplet' === sanitize_text_field( wp_unslash( $_GET['commande'] ) ) ) : ?>
 						<div class="bagxpro-notice bagxpro-notice--error" role="alert">
-							<?php esc_html_e( 'Merci de renseigner le nom, le prénom et une adresse e-mail valide.', 'bagxpro' ); ?>
+							<?php esc_html_e( 'Merci de renseigner tous les champs obligatoires (société, nom, prénom, e-mail, type d’impression).', 'bagxpro' ); ?>
 						</div>
 					<?php elseif ( isset( $_GET['commande'] ) && 'nonce' === sanitize_text_field( wp_unslash( $_GET['commande'] ) ) ) : ?>
 						<div class="bagxpro-notice bagxpro-notice--error" role="alert">
@@ -209,7 +223,17 @@ while ( have_posts() ) :
 						if ( ! empty( $product_color_rows ) ) :
 							foreach ( $product_color_rows as $idx => $crow ) {
 								$hex            = isset( $crow['hex'] ) ? $crow['hex'] : '';
-								$label          = ! empty( $crow['label'] ) ? $crow['label'] : sprintf( /* translators: %d: index */ __( 'Couleur %d', 'bagxpro' ), $idx + 1 );
+								$color_name     = ! empty( $crow['name'] ) ? $crow['name'] : '';
+								$strap_label    = ! empty( $crow['label'] ) ? $crow['label'] : $color_name;
+								if ( '' === $color_name ) {
+									$color_name = $strap_label;
+								}
+								if ( '' === $strap_label ) {
+									$strap_label = sprintf( /* translators: %d: index */ __( 'Couleur %d', 'bagxpro' ), $idx + 1 );
+								}
+								if ( '' === $color_name ) {
+									$color_name = $strap_label;
+								}
 								$is_first       = ( 0 === $idx );
 								$selected_class = $is_first ? ' is-selected' : '';
 								$aria_pressed   = $is_first ? 'true' : 'false';
@@ -220,9 +244,10 @@ while ( have_posts() ) :
 									class="bagxpro-swatch<?php echo esc_attr( $selected_class ); ?>"
 									style="<?php echo esc_attr( $style_bg ); ?>"
 									data-layer-index="<?php echo (int) $idx; ?>"
-									data-strap-label="<?php echo esc_attr( $label ); ?>"
+									data-strap-label="<?php echo esc_attr( $strap_label ); ?>"
+									data-bagxpro-color-name="<?php echo esc_attr( $color_name ); ?>"
 									aria-pressed="<?php echo esc_attr( $aria_pressed ); ?>"
-									aria-label="<?php echo esc_attr( $label ); ?>"
+									aria-label="<?php echo esc_attr( $color_name ); ?>"
 								></button>
 								<?php
 							}
@@ -242,7 +267,54 @@ while ( have_posts() ) :
 						</div>
 					</div>
 
+					<?php
+					$bagxpro_print_faces_options = function_exists( 'bagxpro_produit_print_faces_options' )
+						? bagxpro_produit_print_faces_options()
+						: array(
+							'2' => __( 'Impression 2 faces', 'bagxpro' ),
+							'4' => __( 'Impression 4 faces', 'bagxpro' ),
+						);
+					?>
+					<fieldset class="bagxpro-field bagxpro-field--print-faces">
+						<legend class="bagxpro-field__label"><?php esc_html_e( 'Type d’impression', 'bagxpro' ); ?></legend>
+						<div class="bagxpro-radio-group" role="radiogroup">
+							<?php
+							$print_faces_first = true;
+							foreach ( $bagxpro_print_faces_options as $faces_value => $faces_label ) :
+								$faces_id = 'bagxpro-print-faces-' . esc_attr( $faces_value );
+								?>
+								<label class="bagxpro-radio" for="<?php echo esc_attr( $faces_id ); ?>">
+									<input
+										type="radio"
+										class="bagxpro-radio__input"
+										name="bagxpro_print_faces"
+										id="<?php echo esc_attr( $faces_id ); ?>"
+										value="<?php echo esc_attr( $faces_value ); ?>"
+										<?php checked( $print_faces_first ); ?>
+										required
+									>
+									<span class="bagxpro-radio__label"><?php echo esc_html( $faces_label ); ?></span>
+								</label>
+								<?php
+								$print_faces_first = false;
+							endforeach;
+							?>
+						</div>
+					</fieldset>
+
 					<div class="bagxpro-produit-panel__contact" data-bagxpro-contact>
+						<div class="bagxpro-field">
+							<label class="bagxpro-field__label" for="bagxpro-societe"><?php esc_html_e( 'Nom de la société', 'bagxpro' ); ?></label>
+							<input
+								type="text"
+								class="bagxpro-input"
+								id="bagxpro-societe"
+								name="bagxpro_societe"
+								autocomplete="organization"
+								maxlength="120"
+								required
+							>
+						</div>
 						<div class="bagxpro-field">
 							<label class="bagxpro-field__label" for="bagxpro-nom"><?php esc_html_e( 'Nom', 'bagxpro' ); ?></label>
 							<input

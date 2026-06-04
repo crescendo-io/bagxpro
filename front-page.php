@@ -183,13 +183,13 @@ if ( is_string( $bagxpro_lp_text ) && '' !== trim( $bagxpro_lp_text ) ) {
 
 /**
  * Extrait un entier depuis un chiffre affiché (ex. "3 000" → 3000).
+ * Conservé pour compatibilité ; préférer bagxpro_parse_stat_number().
  *
  * @param mixed $raw Valeur ACF / texte.
  * @return int
  */
 $bagxpro_stat_to_int = static function ( $raw ) {
-	$digits = preg_replace( '/\D/', '', (string) $raw );
-	return '' !== $digits ? (int) $digits : 0;
+	return bagxpro_parse_stat_number( $raw )['value'];
 };
 ?>
 
@@ -253,7 +253,7 @@ $bagxpro_stat_to_int = static function ( $raw ) {
 		<div class="row">
 			<div class="col-sm-3">
 				<div class="card-border">
-					<div class="card-number" data-bagxpro-count="<?php echo esc_attr( (string) $bagxpro_stat_to_int( $bagxpro_s1['number'] ) ); ?>">0</div>
+					<?php bagxpro_render_card_number( $bagxpro_s1['number'] ); ?>
 					<div class="card-label"><?php echo esc_html( $bagxpro_s1['label'] ); ?></div>
 					<div class="card-description">
 						<?php echo esc_html( $bagxpro_s1['description'] ); ?>
@@ -262,7 +262,7 @@ $bagxpro_stat_to_int = static function ( $raw ) {
 			</div>
 			<div class="col-sm-3">
 				<div class="card-border">
-					<div class="card-number" data-bagxpro-count="<?php echo esc_attr( (string) $bagxpro_stat_to_int( $bagxpro_s2['number'] ) ); ?>">0</div>
+					<?php bagxpro_render_card_number( $bagxpro_s2['number'] ); ?>
 					<div class="card-label"><?php echo esc_html( $bagxpro_s2['label'] ); ?></div>
 					<div class="card-description">
 						<?php echo esc_html( $bagxpro_s2['description'] ); ?>
@@ -277,7 +277,7 @@ $bagxpro_stat_to_int = static function ( $raw ) {
 			</div>
 			<div class="col-sm-3">
 				<div class="card-border">
-					<div class="card-number" data-bagxpro-count="<?php echo esc_attr( (string) $bagxpro_stat_to_int( $bagxpro_s3['number'] ) ); ?>">0</div>
+					<?php bagxpro_render_card_number( $bagxpro_s3['number'] ); ?>
 					<div class="card-label"><?php echo esc_html( $bagxpro_s3['label'] ); ?></div>
 					<div class="card-description">
 						<?php echo esc_html( $bagxpro_s3['description'] ); ?>
