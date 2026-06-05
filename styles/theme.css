@@ -1009,7 +1009,8 @@ body.bagxpro-loader-done .strate-hero.home .container-bag-home .placeholder {
 
 .list-logo ul li img{
     max-width: 250px;
-    width: 100%;
+    width: auto;
+    max-height: 100px;
 }
 
 .list-logo .label{
