@@ -157,7 +157,7 @@ while ( have_posts() ) :
 					<header class="bagxpro-produit-panel__header">
 						<h1><?php the_title(); ?></h1>
 						<p>
-							<div class="description_product">	
+							<div class="description-produit">	
 								<?= get_field('description_product'); ?>
 							</div>
 						</p>
@@ -252,7 +252,7 @@ while ( have_posts() ) :
 						</div>
 					</div>
 
-					<?php
+
 					<?php
 					$bagxpro_quantity_tier_options = function_exists( 'bagxpro_produit_quantity_tier_options' )
 						? bagxpro_produit_quantity_tier_options()
