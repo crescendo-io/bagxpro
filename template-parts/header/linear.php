@@ -41,7 +41,7 @@ Demandez votre devis pour vos Big Bags personnalisés, qualité professionnelle,
 
             <div class="col-3 col-md-2 bagxpro-header-cta text-right">
                 <a href="#modal-configurator" class="button primary modal-configurator-button">
-                    <span class="bagxpro-header-cta__full hidden-xs">CONFIGURER MON PRODUITS  +</span>
+                    <span class="bagxpro-header-cta__full hidden-xs">NOS PRODUITS</span>
                     <span class="bagxpro-header-cta__short visible-xs" aria-hidden="true">+</span>
                 </a>
             </div>
