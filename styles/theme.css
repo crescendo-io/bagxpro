@@ -998,6 +998,8 @@ body.bagxpro-loader-done .strate-hero.home .container-bag-home .placeholder {
     display: flex;
     padding: 0 30px;
     align-items: center;
+    max-width: 1920px;
+    margin: 0 auto;
 }
 
 .list-logo ul li{
