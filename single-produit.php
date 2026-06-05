@@ -157,13 +157,9 @@ while ( have_posts() ) :
 					<header class="bagxpro-produit-panel__header">
 						<h1><?php the_title(); ?></h1>
 						<p>
-						<ul class="description-produit">
-							<li>Capacité : 80 litres</li>
-							<li>Dimensions : 50 x 40 x 30 cm</li>
-							<li>Format compact : idéal pour les petits volumes</li>
-							<li>Matériau : toile tissée résistante</li>
-							<li>Sangles : renforcées pour une manutention facile</li>
-						</ul>
+							<div class="description_product">	
+								<?= get_field('description_product'); ?>
+							</div>
 						</p>
 					</header>
 
@@ -256,6 +252,7 @@ while ( have_posts() ) :
 						</div>
 					</div>
 
+					<?php
 					<?php
 					$bagxpro_quantity_tier_options = function_exists( 'bagxpro_produit_quantity_tier_options' )
 						? bagxpro_produit_quantity_tier_options()
@@ -420,8 +417,7 @@ while ( have_posts() ) :
 					</div>
 
 					<button type="submit" class="bagxpro-btn-order">
-						<span class="bagxpro-btn-order__main"><?php esc_html_e( 'Demander un devis', 'bagxpro' ); ?></span>
-						<span class="bagxpro-btn-order__sub"><?php esc_html_e( 'Devis sous 24h', 'bagxpro' ); ?></span>
+						<?php esc_html_e( 'COMMANDER MON BIG BAG', 'bagxpro' ); ?>
 					</button>
 					</form>
 
