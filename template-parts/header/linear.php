@@ -22,7 +22,7 @@ Demandez votre devis pour vos Big Bags personnalisés, qualité professionnelle,
                 </div>
             </div>
 
-            <div class="col-6 col-md-3 bagxpro-header-logo">
+            <div class="col-6 col-md-2 bagxpro-header-logo">
                 <?php if(isset($option_logo_primary_array['url']) && $option_logo_primary_array['url']): ?>
                 <a href="<?= get_site_url(); ?>">
                     <img src="<?= $option_logo_primary_array['url']; ?>" class="logo" alt="<?= $option_logo_primary_array['alt']; ?>">
@@ -31,7 +31,7 @@ Demandez votre devis pour vos Big Bags personnalisés, qualité professionnelle,
                 <?php endif; ?>
             </div>
 
-            <div class="col-md-5 hidden-xs text-center bagxpro-header-nav">
+            <div class="col-md-8 hidden-xs text-center bagxpro-header-nav">
                 <?= wp_nav_menu(array(
                     'menu'				=> "menu",
                     'menu_class'		=> "",
