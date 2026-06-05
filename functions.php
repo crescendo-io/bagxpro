@@ -7,6 +7,8 @@ require_once get_stylesheet_directory() . '/inc/acf-list-products.php';
 require_once get_stylesheet_directory() . '/inc/bagxpro-page-loader.php';
 require_once get_stylesheet_directory() . '/inc/bagxpro-configurator-sidebar.php';
 require_once get_stylesheet_directory() . '/inc/bagxpro-related-products.php';
+require_once get_stylesheet_directory() . '/inc/bagxpro-contact-form.php';
+require_once get_stylesheet_directory() . '/inc/acf-contact-page.php';
 
 add_action( 'after_setup_theme', 'bagxpro_theme_support' );
 function bagxpro_theme_support() {
@@ -272,6 +274,24 @@ function wpm_enqueue_styles(){
 			get_stylesheet_directory_uri() . '/styles/product-bag.css',
 			array( 'theme' ),
 			file_exists( $css_path ) ? filemtime( $css_path ) : null
+		);
+	}
+
+	if ( is_page_template( 'page-contact.php' ) ) {
+		$product_bag_css = get_stylesheet_directory() . '/styles/product-bag.css';
+		wp_enqueue_style(
+			'bagxpro-product-bag',
+			get_stylesheet_directory_uri() . '/styles/product-bag.css',
+			array( 'theme' ),
+			file_exists( $product_bag_css ) ? filemtime( $product_bag_css ) : null
+		);
+
+		$contact_css = get_stylesheet_directory() . '/styles/contact.css';
+		wp_enqueue_style(
+			'bagxpro-contact',
+			get_stylesheet_directory_uri() . '/styles/contact.css',
+			array( 'bagxpro-product-bag' ),
+			file_exists( $contact_css ) ? filemtime( $contact_css ) : null
 		);
 	}
 

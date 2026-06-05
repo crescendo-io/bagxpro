@@ -1,0 +1,216 @@
+/* Page contact */
+
+.bagxpro-contact-page {
+	padding: 180px 0 72px;
+	background: #f2f2f2;
+	min-height: 60vh;
+}
+
+.bagxpro-contact-page__header {
+	max-width: 760px;
+	margin: 0 auto 40px;
+	text-align: center;
+}
+
+.bagxpro-contact-page__title {
+	margin: 0 0 16px;
+	font-size: clamp(1.75rem, 3vw, 2.25rem);
+	line-height: 1.2;
+	color: #1a1a1a;
+}
+
+.bagxpro-contact-page__intro {
+	font-size: 16px;
+	line-height: 1.6;
+	color: #4a4a4a;
+}
+
+.bagxpro-contact-page__grid {
+	align-items: flex-start;
+	gap: 28px 0;
+}
+
+.bagxpro-contact-card {
+	background: #fff;
+	border-radius: 12px;
+	padding: 28px 24px;
+	box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+}
+
+.bagxpro-contact-card + .bagxpro-contact-card {
+	margin-top: 20px;
+}
+
+.bagxpro-contact-card__title {
+	margin: 0 0 20px;
+	font-size: 18px;
+	font-weight: 700;
+	color: #1a1a1a;
+}
+
+.bagxpro-contact-info {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.bagxpro-contact-info__item + .bagxpro-contact-info__item {
+	margin-top: 18px;
+	padding-top: 18px;
+	border-top: 1px solid #e8e8e8;
+}
+
+.bagxpro-contact-info__label {
+	display: block;
+	margin-bottom: 6px;
+	font-size: 13px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: #6b6b6b;
+}
+
+.bagxpro-contact-info__value {
+	display: block;
+	font-size: 16px;
+	line-height: 1.45;
+	color: #1a1a1a;
+	text-decoration: none;
+}
+
+a.bagxpro-contact-info__value:hover {
+	color: #eab933;
+}
+
+.bagxpro-contact-hours {
+	margin: 0;
+}
+
+.bagxpro-contact-hours__row {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	gap: 16px;
+	padding: 10px 0;
+	border-bottom: 1px solid #efefef;
+}
+
+.bagxpro-contact-hours__row:last-child {
+	border-bottom: 0;
+	padding-bottom: 0;
+}
+
+.bagxpro-contact-hours__day {
+	margin: 0;
+	font-size: 15px;
+	font-weight: 600;
+	color: #1a1a1a;
+}
+
+.bagxpro-contact-hours__time {
+	margin: 0;
+	font-size: 15px;
+	color: #4a4a4a;
+	text-align: right;
+}
+
+.bagxpro-contact-form-wrap .bagxpro-notice {
+	margin-bottom: 20px;
+}
+
+.bagxpro-contact-form .bagxpro-field {
+	margin-bottom: 18px;
+}
+
+.bagxpro-contact-form .bagxpro-field__label {
+	display: block;
+	margin-bottom: 8px;
+	font-weight: 600;
+	font-size: 15px;
+	color: #1a1a1a;
+}
+
+.bagxpro-contact-form .bagxpro-field__req {
+	color: #c2410c;
+}
+
+.bagxpro-contact-form .bagxpro-input,
+.bagxpro-contact-form .bagxpro-textarea {
+	width: 100%;
+	padding: 14px 16px;
+	font-family: inherit;
+	font-size: 15px;
+	line-height: 1.35;
+	color: #1a1a1a;
+	background: #fff;
+	border: 1px solid #d0d0d0;
+	border-radius: 6px;
+	box-sizing: border-box;
+	transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.bagxpro-contact-form .bagxpro-input:focus,
+.bagxpro-contact-form .bagxpro-textarea:focus {
+	outline: none;
+	border-color: #eab933;
+	box-shadow: 0 0 0 3px rgba(234, 185, 51, 0.25);
+}
+
+.bagxpro-contact-form .bagxpro-textarea {
+	resize: vertical;
+	min-height: 140px;
+}
+
+.bagxpro-contact-form__row {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 16px;
+}
+
+.bagxpro-contact-form .bagxpro-rgpd {
+	margin-top: 8px;
+}
+
+.bagxpro-contact-form .bagxpro-rgpd__text {
+	font-size: 13px;
+	line-height: 1.55;
+	color: #4a4a4a;
+}
+
+.bagxpro-contact-form .bagxpro-rgpd__privacy-link {
+	color: #1a1a1a;
+	font-weight: 600;
+}
+
+.bagxpro-contact-form .bagxpro-btn-order {
+	margin-top: 8px;
+}
+
+@media (max-width: 991px) {
+	.bagxpro-contact-page {
+		padding: 120px 0 48px;
+	}
+}
+
+@media (max-width: 767px) {
+	.bagxpro-contact-page {
+		padding: 100px 0 40px;
+	}
+
+	.bagxpro-contact-card {
+		padding: 22px 18px;
+	}
+
+	.bagxpro-contact-form__row {
+		grid-template-columns: 1fr;
+	}
+
+	.bagxpro-contact-hours__row {
+		flex-direction: column;
+		gap: 4px;
+	}
+
+	.bagxpro-contact-hours__time {
+		text-align: left;
+	}
+}
