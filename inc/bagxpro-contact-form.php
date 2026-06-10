@@ -10,26 +10,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * E-mail de notification (aligné sur le formulaire produit).
- *
- * @param int $context_id ID de contexte optionnel (page, produit…).
- * @return string
- */
-function bagxpro_get_mail_notification_email( $context_id = 0 ) {
-	return (string) apply_filters( 'bagxpro_produit_mail_to', get_option( 'admin_email' ), (int) $context_id );
-}
-
-/**
- * Nom du destinataire notification.
- *
- * @param int $context_id ID de contexte optionnel.
- * @return string
- */
-function bagxpro_get_mail_notification_name( $context_id = 0 ) {
-	return (string) apply_filters( 'bagxpro_produit_mail_to_name', get_bloginfo( 'name' ), (int) $context_id );
-}
-
-/**
  * Expéditeur Mailjet par défaut.
  *
  * @return array{email: string, name: string}
@@ -132,9 +112,9 @@ function bagxpro_handle_contact_form_submit() {
 	$html .= '<table style="border-collapse:collapse;max-width:640px;">' . $html_rows . '</table>';
 	$html .= '</body></html>';
 
-	$from      = bagxpro_get_mailjet_from();
-	$to_email  = bagxpro_get_mail_notification_email( $page_id );
-	$to_name   = bagxpro_get_mail_notification_name( $page_id );
+	$from       = bagxpro_get_mailjet_from();
+	$to_emails  = bagxpro_get_mail_notification_recipients( $page_id );
+	$to_name    = bagxpro_get_mail_notification_name( $page_id );
 	$subject   = apply_filters(
 		'bagxpro_contact_mail_subject',
 		sprintf(
@@ -149,7 +129,7 @@ function bagxpro_handle_contact_form_submit() {
 
 	$result = bagxpro_mailjet_send_message(
 		array(
-			'to_email'    => $to_email,
+			'to_emails'   => $to_emails,
 			'to_name'     => $to_name,
 			'subject'     => $subject,
 			'html'        => $html,

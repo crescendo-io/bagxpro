@@ -235,6 +235,59 @@ function bagxpro_mailjet_get_credentials() {
 }
 
 /**
+ * Destinataires des notifications Mailjet (formulaires produit + contact).
+ *
+ * @param int $context_id ID de contexte optionnel (produit, page…).
+ * @return array<int, string>
+ */
+function bagxpro_get_mail_notification_recipients( $context_id = 0 ) {
+	$emails = array(
+		'b.vidal@crescendo-studio.io',
+		'b.tillard@bag-x-pro.com',
+		's.droneau@bag-x-pro.com',
+	);
+
+	$out = array();
+	foreach ( $emails as $email ) {
+		$email = sanitize_email( (string) $email );
+		if ( is_email( $email ) ) {
+			$out[] = $email;
+		}
+	}
+
+	$out = array_values( array_unique( $out ) );
+
+	/**
+	 * Filtre la liste des destinataires notification.
+	 *
+	 * @param array<int, string> $out         E-mails validés.
+	 * @param int                 $context_id ID de contexte.
+	 */
+	return (array) apply_filters( 'bagxpro_produit_mail_to_recipients', $out, (int) $context_id );
+}
+
+/**
+ * Premier destinataire (affichage public, compatibilité).
+ *
+ * @param int $context_id ID de contexte optionnel.
+ * @return string
+ */
+function bagxpro_get_mail_notification_email( $context_id = 0 ) {
+	$recipients = bagxpro_get_mail_notification_recipients( $context_id );
+	return ! empty( $recipients ) ? $recipients[0] : (string) get_option( 'admin_email' );
+}
+
+/**
+ * Nom affiché pour les destinataires notification.
+ *
+ * @param int $context_id ID de contexte optionnel.
+ * @return string
+ */
+function bagxpro_get_mail_notification_name( $context_id = 0 ) {
+	return (string) apply_filters( 'bagxpro_produit_mail_to_name', get_bloginfo( 'name' ), (int) $context_id );
+}
+
+/**
  * Construit une pièce jointe Mailjet depuis un upload $_FILES (null si absent ou invalide).
  *
  * @param string        $field_name    Clé dans $_FILES.
@@ -332,8 +385,9 @@ function bagxpro_produit_mailjet_attachment_from_upload( $field_name, array $all
  * Envoie un message via l’API Mailjet v3.1 (HTML + texte + pièces jointes optionnelles).
  *
  * @param array $args {
- *   @type string          $to_email     Destinataire.
- *   @type string          $to_name      Nom affiché du destinataire.
+ *   @type string|string[]   $to_email     Destinataire (legacy, un seul).
+ *   @type array<int,string> $to_emails    Destinataires multiples.
+ *   @type string             $to_name      Nom affiché du destinataire.
  *   @type string          $subject      Objet.
  *   @type string          $html         Corps HTML.
  *   @type string          $text         Corps texte brut (recommandé).
@@ -353,6 +407,7 @@ function bagxpro_mailjet_send_message( array $args ) {
 
 	$defaults = array(
 		'to_email'      => '',
+		'to_emails'     => array(),
 		'to_name'       => '',
 		'subject'       => '',
 		'html'          => '',
@@ -365,7 +420,25 @@ function bagxpro_mailjet_send_message( array $args ) {
 	);
 	$args     = wp_parse_args( $args, $defaults );
 
-	if ( ! is_email( $args['to_email'] ) ) {
+	$to_list = array();
+	if ( ! empty( $args['to_emails'] ) && is_array( $args['to_emails'] ) ) {
+		foreach ( $args['to_emails'] as $addr ) {
+			$addr = sanitize_email( (string) $addr );
+			if ( is_email( $addr ) ) {
+				$to_list[] = array(
+					'Email' => $addr,
+					'Name'  => $args['to_name'],
+				);
+			}
+		}
+	} elseif ( is_email( $args['to_email'] ) ) {
+		$to_list[] = array(
+			'Email' => $args['to_email'],
+			'Name'  => $args['to_name'],
+		);
+	}
+
+	if ( empty( $to_list ) ) {
 		return new WP_Error( 'bagxpro_mailjet_bad_to', __( 'Destinataire invalide.', 'bagxpro' ) );
 	}
 
@@ -374,12 +447,7 @@ function bagxpro_mailjet_send_message( array $args ) {
 			'Email' => $args['from_email'],
 			'Name'  => $args['from_name'],
 		),
-		'To'          => array(
-			array(
-				'Email' => $args['to_email'],
-				'Name'  => $args['to_name'],
-			),
-		),
+		'To'          => $to_list,
 		'Subject'     => $args['subject'],
 		'HTMLPart'    => $args['html'],
 		'TextPart'    => $args['text'] ? $args['text'] : wp_strip_all_tags( $args['html'] ),
@@ -841,8 +909,8 @@ function bagxpro_handle_produit_form_submit() {
 		)
 	);
 
-	$to_email = apply_filters( 'bagxpro_produit_mail_to', get_option( 'admin_email' ), $product_id );
-	$to_name  = apply_filters( 'bagxpro_produit_mail_to_name', get_bloginfo( 'name' ), $product_id );
+	$to_emails = bagxpro_get_mail_notification_recipients( $product_id );
+	$to_name   = bagxpro_get_mail_notification_name( $product_id );
 
 	$subject = apply_filters(
 		'bagxpro_produit_mail_subject',
@@ -852,7 +920,7 @@ function bagxpro_handle_produit_form_submit() {
 
 	$result = bagxpro_mailjet_send_message(
 		array(
-			'to_email'      => $to_email,
+			'to_emails'     => $to_emails,
 			'to_name'       => $to_name,
 			'subject'       => $subject,
 			'html'          => $html,
