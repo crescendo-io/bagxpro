@@ -38,13 +38,13 @@ function bagxpro_get_mailjet_from() {
 	$from = apply_filters(
 		'bagxpro_mailjet_from',
 		array(
-			'email' => 'infos@crescendo-studio.io',
+			'email' => 'b.vidal@crescendo-studio.io',
 			'name'  => 'BAG x PRO',
 		)
 	);
 
 	return array(
-		'email' => isset( $from['email'] ) ? (string) $from['email'] : 'infos@crescendo-studio.io',
+		'email' => isset( $from['email'] ) ? (string) $from['email'] : 'b.vidal@crescendo-studio.io',
 		'name'  => isset( $from['name'] ) ? (string) $from['name'] : 'BAG x PRO',
 	);
 }

@@ -357,7 +357,7 @@ function bagxpro_mailjet_send_message( array $args ) {
 		'subject'       => '',
 		'html'          => '',
 		'text'          => '',
-		'from_email'    => 'infos@crescendo-studio.io',
+		'from_email'    => 'b.vidal@crescendo-studio.io',
 		'from_name'     => 'BAG x PRO',
 		'reply_email'   => '',
 		'reply_name'    => '',
@@ -836,7 +836,7 @@ function bagxpro_handle_produit_form_submit() {
 	$from = apply_filters(
 		'bagxpro_mailjet_from',
 		array(
-			'email' => 'infos@crescendo-studio.io',
+			'email' => 'b.vidal@crescendo-studio.io',
 			'name'  => 'BAG x PRO',
 		)
 	);
@@ -857,7 +857,7 @@ function bagxpro_handle_produit_form_submit() {
 			'subject'       => $subject,
 			'html'          => $html,
 			'text'          => $text_body_mail,
-			'from_email'    => isset( $from['email'] ) ? $from['email'] : 'infos@crescendo-studio.io',
+			'from_email'    => isset( $from['email'] ) ? $from['email'] : 'b.vidal@crescendo-studio.io',
 			'from_name'     => isset( $from['name'] ) ? $from['name'] : 'BAG x PRO',
 			'reply_email'   => $email,
 			'reply_name'    => trim( $prenom . ' ' . $nom ),
