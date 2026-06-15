@@ -19,7 +19,7 @@ $status  = isset( $_GET['contact'] ) ? sanitize_text_field( wp_unslash( $_GET['c
 		</div>
 	<?php elseif ( 'incomplet' === $status ) : ?>
 		<div class="bagxpro-notice bagxpro-notice--error" role="alert">
-			<?php esc_html_e( 'Merci de renseigner le nom, le prénom, une adresse e-mail valide et votre message.', 'bagxpro' ); ?>
+			<?php esc_html_e( 'Merci de renseigner le nom, le prénom, une adresse e-mail valide, votre téléphone et votre message.', 'bagxpro' ); ?>
 		</div>
 	<?php elseif ( 'nonce' === $status ) : ?>
 		<div class="bagxpro-notice bagxpro-notice--error" role="alert">
@@ -53,6 +53,8 @@ $status  = isset( $_GET['contact'] ) ? sanitize_text_field( wp_unslash( $_GET['c
 			<input type="text" name="bagxpro_contact_hp" id="bagxpro-contact-hp" value="" tabindex="-1" autocomplete="off">
 		</div>
 
+		<?php bagxpro_the_required_fields_legend(); ?>
+
 		<div class="bagxpro-field">
 			<label class="bagxpro-field__label" for="bagxpro-contact-societe"><?php esc_html_e( 'Nom de la société', 'bagxpro' ); ?></label>
 			<input type="text" class="bagxpro-input" id="bagxpro-contact-societe" name="bagxpro_contact_societe" autocomplete="organization" maxlength="120">
@@ -60,28 +62,28 @@ $status  = isset( $_GET['contact'] ) ? sanitize_text_field( wp_unslash( $_GET['c
 
 		<div class="bagxpro-contact-form__row">
 			<div class="bagxpro-field">
-				<label class="bagxpro-field__label" for="bagxpro-contact-nom"><?php esc_html_e( 'Nom', 'bagxpro' ); ?> <span class="bagxpro-field__req" aria-hidden="true">*</span></label>
+				<label class="bagxpro-field__label" for="bagxpro-contact-nom"><?php esc_html_e( 'Nom', 'bagxpro' ); ?> <?php bagxpro_the_required_field_mark(); ?></label>
 				<input type="text" class="bagxpro-input" id="bagxpro-contact-nom" name="bagxpro_contact_nom" autocomplete="family-name" required>
 			</div>
 			<div class="bagxpro-field">
-				<label class="bagxpro-field__label" for="bagxpro-contact-prenom"><?php esc_html_e( 'Prénom', 'bagxpro' ); ?> <span class="bagxpro-field__req" aria-hidden="true">*</span></label>
+				<label class="bagxpro-field__label" for="bagxpro-contact-prenom"><?php esc_html_e( 'Prénom', 'bagxpro' ); ?> <?php bagxpro_the_required_field_mark(); ?></label>
 				<input type="text" class="bagxpro-input" id="bagxpro-contact-prenom" name="bagxpro_contact_prenom" autocomplete="given-name" required>
 			</div>
 		</div>
 
 		<div class="bagxpro-contact-form__row">
 			<div class="bagxpro-field">
-				<label class="bagxpro-field__label" for="bagxpro-contact-email"><?php esc_html_e( 'E-mail', 'bagxpro' ); ?> <span class="bagxpro-field__req" aria-hidden="true">*</span></label>
+				<label class="bagxpro-field__label" for="bagxpro-contact-email"><?php esc_html_e( 'E-mail', 'bagxpro' ); ?> <?php bagxpro_the_required_field_mark(); ?></label>
 				<input type="email" class="bagxpro-input" id="bagxpro-contact-email" name="bagxpro_contact_email" autocomplete="email" inputmode="email" required>
 			</div>
 			<div class="bagxpro-field">
-				<label class="bagxpro-field__label" for="bagxpro-contact-telephone"><?php esc_html_e( 'Téléphone', 'bagxpro' ); ?></label>
-				<input type="tel" class="bagxpro-input" id="bagxpro-contact-telephone" name="bagxpro_contact_telephone" autocomplete="tel" inputmode="tel">
+				<label class="bagxpro-field__label" for="bagxpro-contact-telephone"><?php esc_html_e( 'Téléphone', 'bagxpro' ); ?> <?php bagxpro_the_required_field_mark(); ?></label>
+				<input type="tel" class="bagxpro-input" id="bagxpro-contact-telephone" name="bagxpro_contact_telephone" autocomplete="tel" inputmode="tel" required>
 			</div>
 		</div>
 
 		<div class="bagxpro-field">
-			<label class="bagxpro-field__label" for="bagxpro-contact-message"><?php esc_html_e( 'Votre message', 'bagxpro' ); ?> <span class="bagxpro-field__req" aria-hidden="true">*</span></label>
+			<label class="bagxpro-field__label" for="bagxpro-contact-message"><?php esc_html_e( 'Votre message', 'bagxpro' ); ?> <?php bagxpro_the_required_field_mark(); ?></label>
 			<textarea class="bagxpro-input bagxpro-textarea" id="bagxpro-contact-message" name="bagxpro_contact_message" rows="6" required></textarea>
 		</div>
 
@@ -99,7 +101,7 @@ $status  = isset( $_GET['contact'] ) ? sanitize_text_field( wp_unslash( $_GET['c
 			<?php endif; ?>
 			<label class="bagxpro-rgpd__consent" for="bagxpro-contact-rgpd-consent">
 				<input type="checkbox" name="bagxpro_contact_rgpd_consent" id="bagxpro-contact-rgpd-consent" class="bagxpro-rgpd__checkbox" value="1" required>
-				<span class="bagxpro-rgpd__consent-text"><?php esc_html_e( 'Je confirme avoir pris connaissance de l’information ci-dessus et accepter le traitement de mes données personnelles dans ce cadre.', 'bagxpro' ); ?></span>
+				<span class="bagxpro-rgpd__consent-text"><?php esc_html_e( 'Je confirme avoir pris connaissance de l’information ci-dessus et accepter le traitement de mes données personnelles dans ce cadre.', 'bagxpro' ); ?> <?php bagxpro_the_required_field_mark(); ?></span>
 			</label>
 		</div>
 

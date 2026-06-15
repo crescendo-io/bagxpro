@@ -58,7 +58,7 @@ function bagxpro_handle_contact_form_submit() {
 	$telephone = isset( $_POST['bagxpro_contact_telephone'] ) ? sanitize_text_field( wp_unslash( $_POST['bagxpro_contact_telephone'] ) ) : '';
 	$message   = isset( $_POST['bagxpro_contact_message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['bagxpro_contact_message'] ) ) : '';
 
-	if ( '' === $nom || '' === $prenom || ! is_email( $email ) || '' === trim( $message ) ) {
+	if ( '' === $nom || '' === $prenom || ! is_email( $email ) || '' === trim( $telephone ) || '' === trim( $message ) ) {
 		wp_safe_redirect( add_query_arg( 'contact', 'incomplet', $back ) );
 		exit;
 	}

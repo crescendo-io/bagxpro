@@ -116,6 +116,7 @@ $bagxpro_fallback_img = get_stylesheet_directory_uri() . '/images/product.png';
 					<div class="col-sm-3">
 						<article class="card-product">
 							<div class="img-product">
+								<?php bagxpro_render_product_bestseller_tag( $bagxpro_pid ); ?>
 								<a href="<?php echo esc_url( get_permalink() ); ?>">
 									<img
 										src="<?php echo esc_url( $bagxpro_thumb ); ?>"

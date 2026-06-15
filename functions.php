@@ -10,6 +10,24 @@ require_once get_stylesheet_directory() . '/inc/bagxpro-related-products.php';
 require_once get_stylesheet_directory() . '/inc/bagxpro-contact-form.php';
 require_once get_stylesheet_directory() . '/inc/acf-contact-page.php';
 
+/**
+ * Astérisque « champ obligatoire » (sans infobulle au survol).
+ */
+function bagxpro_the_required_field_mark() {
+	echo '<span class="bagxpro-field__req" aria-hidden="true">*</span>';
+}
+
+/**
+ * Légende « * Champs obligatoires » au-dessus d’un formulaire.
+ */
+function bagxpro_the_required_fields_legend() {
+	echo '<p class="bagxpro-form-required-note">';
+	echo '<span class="bagxpro-field__req" aria-hidden="true">*</span>';
+	echo ' <span class="bagxpro-form-required-note__text">';
+	esc_html_e( 'Champs obligatoires', 'bagxpro' );
+	echo '</span></p>';
+}
+
 add_action( 'after_setup_theme', 'bagxpro_theme_support' );
 function bagxpro_theme_support() {
 	add_theme_support( 'post-thumbnails' );

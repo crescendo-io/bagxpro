@@ -130,7 +130,7 @@ while ( have_posts() ) :
 						</div>
 					<?php elseif ( isset( $_GET['commande'] ) && 'incomplet' === sanitize_text_field( wp_unslash( $_GET['commande'] ) ) ) : ?>
 						<div class="bagxpro-notice bagxpro-notice--error" role="alert">
-							<?php esc_html_e( 'Merci de renseigner tous les champs obligatoires (société, nom, prénom, e-mail, quantité, type d’impression).', 'bagxpro' ); ?>
+							<?php esc_html_e( 'Merci de renseigner tous les champs obligatoires (société, nom, prénom, e-mail, téléphone, quantité, type d’impression).', 'bagxpro' ); ?>
 						</div>
 					<?php elseif ( isset( $_GET['commande'] ) && 'nonce' === sanitize_text_field( wp_unslash( $_GET['commande'] ) ) ) : ?>
 						<div class="bagxpro-notice bagxpro-notice--error" role="alert">
@@ -155,6 +155,7 @@ while ( have_posts() ) :
 					<?php endif; ?>
 
 					<header class="bagxpro-produit-panel__header">
+						<?php bagxpro_render_product_bestseller_tag( get_the_ID() ); ?>
 						<h1><?php the_title(); ?></h1>
 						<p>
 							<div class="description-produit">	
@@ -178,6 +179,9 @@ while ( have_posts() ) :
 							<label for="bagxpro-hp"><?php esc_html_e( 'Laisser vide', 'bagxpro' ); ?></label>
 							<input type="text" name="bagxpro_hp" id="bagxpro-hp" value="" tabindex="-1" autocomplete="off">
 						</div>
+
+						<?php bagxpro_the_required_fields_legend(); ?>
+
 						<input
 							type="file"
 							name="bagxpro_preview_capture"
@@ -213,7 +217,7 @@ while ( have_posts() ) :
 					</button>
 
 					<div class="bagxpro-field bagxpro-field--straps" data-bagxpro-straps>
-						<span class="bagxpro-field__label" id="bagxpro-straps-label"><?php esc_html_e( 'Couleur des sangles', 'bagxpro' ); ?></span>
+						<span class="bagxpro-field__label" id="bagxpro-straps-label"><?php esc_html_e( 'Couleur des sangles', 'bagxpro' ); ?> <?php bagxpro_the_required_field_mark(); ?></span>
 						<div class="bagxpro-swatches" role="radiogroup" aria-labelledby="bagxpro-straps-label">
 						<?php
 						if ( ! empty( $product_color_rows ) ) :
@@ -270,7 +274,7 @@ while ( have_posts() ) :
 					$bagxpro_quantity_custom_min = max( 1, (int) apply_filters( 'bagxpro_produit_quantity_custom_min', 500 ) );
 					?>
 					<div class="bagxpro-field bagxpro-field--quantity">
-						<label class="bagxpro-field__label" for="bagxpro-quantity-select"><?php esc_html_e( 'Nombre de sacs', 'bagxpro' ); ?></label>
+						<label class="bagxpro-field__label" for="bagxpro-quantity-select"><?php esc_html_e( 'Nombre de sacs', 'bagxpro' ); ?> <?php bagxpro_the_required_field_mark(); ?></label>
 						<div class="bagxpro-select-wrap">
 							<select
 								id="bagxpro-quantity-select"
@@ -288,7 +292,7 @@ while ( have_posts() ) :
 						</div>
 
 						<fieldset class="bagxpro-field bagxpro-field--print-faces">
-							<legend class="bagxpro-field__label"><?php esc_html_e( 'Type d’impression', 'bagxpro' ); ?></legend>
+							<legend class="bagxpro-field__label"><?php esc_html_e( 'Type d’impression', 'bagxpro' ); ?> <?php bagxpro_the_required_field_mark(); ?></legend>
 							<div class="bagxpro-radio-group" role="radiogroup" aria-label="<?php esc_attr_e( 'Type d’impression', 'bagxpro' ); ?>">
 								<?php
 								$print_faces_first = true;
@@ -316,7 +320,7 @@ while ( have_posts() ) :
 
 						<div class="bagxpro-quantity-custom" id="bagxpro-quantity-custom" hidden>
 							<label class="bagxpro-quantity-custom__label" for="bagxpro-quantity-custom-input">
-								<?php esc_html_e( 'Quantité souhaitée (pièces)', 'bagxpro' ); ?>
+								<?php esc_html_e( 'Quantité souhaitée (pièces)', 'bagxpro' ); ?> <?php bagxpro_the_required_field_mark(); ?>
 							</label>
 							<input
 								type="number"
@@ -333,7 +337,7 @@ while ( have_posts() ) :
 
 					<div class="bagxpro-produit-panel__contact" data-bagxpro-contact>
 						<div class="bagxpro-field">
-							<label class="bagxpro-field__label" for="bagxpro-societe"><?php esc_html_e( 'Nom de la société', 'bagxpro' ); ?></label>
+							<label class="bagxpro-field__label" for="bagxpro-societe"><?php esc_html_e( 'Nom de la société', 'bagxpro' ); ?> <?php bagxpro_the_required_field_mark(); ?></label>
 							<input
 								type="text"
 								class="bagxpro-input"
@@ -345,7 +349,7 @@ while ( have_posts() ) :
 							>
 						</div>
 						<div class="bagxpro-field">
-							<label class="bagxpro-field__label" for="bagxpro-nom"><?php esc_html_e( 'Nom', 'bagxpro' ); ?></label>
+							<label class="bagxpro-field__label" for="bagxpro-nom"><?php esc_html_e( 'Nom', 'bagxpro' ); ?> <?php bagxpro_the_required_field_mark(); ?></label>
 							<input
 								type="text"
 								class="bagxpro-input"
@@ -356,7 +360,7 @@ while ( have_posts() ) :
 							>
 						</div>
 						<div class="bagxpro-field">
-							<label class="bagxpro-field__label" for="bagxpro-prenom"><?php esc_html_e( 'Prénom', 'bagxpro' ); ?></label>
+							<label class="bagxpro-field__label" for="bagxpro-prenom"><?php esc_html_e( 'Prénom', 'bagxpro' ); ?> <?php bagxpro_the_required_field_mark(); ?></label>
 							<input
 								type="text"
 								class="bagxpro-input"
@@ -367,7 +371,7 @@ while ( have_posts() ) :
 							>
 						</div>
 						<div class="bagxpro-field">
-							<label class="bagxpro-field__label" for="bagxpro-email"><?php esc_html_e( 'E-mail', 'bagxpro' ); ?></label>
+							<label class="bagxpro-field__label" for="bagxpro-email"><?php esc_html_e( 'E-mail', 'bagxpro' ); ?> <?php bagxpro_the_required_field_mark(); ?></label>
 							<input
 								type="email"
 								class="bagxpro-input"
@@ -379,7 +383,7 @@ while ( have_posts() ) :
 							>
 						</div>
 						<div class="bagxpro-field">
-							<label class="bagxpro-field__label" for="bagxpro-telephone"><?php esc_html_e( 'Téléphone', 'bagxpro' ); ?></label>
+							<label class="bagxpro-field__label" for="bagxpro-telephone"><?php esc_html_e( 'Téléphone', 'bagxpro' ); ?> <?php bagxpro_the_required_field_mark(); ?></label>
 							<input
 								type="tel"
 								class="bagxpro-input"
@@ -387,6 +391,7 @@ while ( have_posts() ) :
 								name="bagxpro_telephone"
 								autocomplete="tel"
 								inputmode="tel"
+								required
 							>
 						</div>
 					</div>
@@ -412,12 +417,12 @@ while ( have_posts() ) :
 								value="1"
 								required
 							>
-							<span class="bagxpro-rgpd__consent-text"><?php esc_html_e( 'Je confirme avoir pris connaissance de l’information ci-dessus et accepter le traitement de mes données personnelles dans ce cadre.', 'bagxpro' ); ?></span>
+							<span class="bagxpro-rgpd__consent-text"><?php esc_html_e( 'Je confirme avoir pris connaissance de l’information ci-dessus et accepter le traitement de mes données personnelles dans ce cadre.', 'bagxpro' ); ?> <?php bagxpro_the_required_field_mark(); ?></span>
 						</label>
 					</div>
 
 					<button type="submit" class="bagxpro-btn-order">
-						<?php esc_html_e( 'COMMANDER MON BIG BAG', 'bagxpro' ); ?>
+						<?php esc_html_e( 'Demander mon devis', 'bagxpro' ); ?>
 					</button>
 					</form>
 

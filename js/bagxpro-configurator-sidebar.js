@@ -1,7 +1,7 @@
 (function () {
 	'use strict';
 
-	var OPEN_SELECTOR = '.modal-configurator-button, a[href="#modal-configurator"]';
+	var OPEN_SELECTOR = '.modal-configurator-button, a[href="#modal-configurator"], .bagxpro-hero-placeholder-trigger';
 	var root = null;
 	var panel = null;
 	var closeBtn = null;
@@ -107,6 +107,17 @@
 		document.addEventListener('keydown', function (event) {
 			var modal = getRoot();
 			if (!modal) {
+				return;
+			}
+
+			if (
+				(event.key === 'Enter' || event.key === ' ') &&
+				event.target &&
+				event.target.matches &&
+				event.target.matches('.bagxpro-hero-placeholder-trigger')
+			) {
+				event.preventDefault();
+				openSidebar();
 				return;
 			}
 

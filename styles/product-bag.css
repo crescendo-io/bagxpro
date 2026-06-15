@@ -288,12 +288,8 @@
 	margin-bottom: 28px;
 }
 
-.bagxpro-produit-panel__title {
-	margin: 0 0 10px;
-	font-size: clamp(1.75rem, 3.5vw, 2.25rem);
-	font-weight: 700;
-	line-height: 1.15;
-	color: var(--bagxpro-sim-text);
+.bagxpro-produit-panel__header .bagxpro-bestseller-tag {
+	margin-bottom: 10px;
 }
 
 .bagxpro-produit-panel__specs {
@@ -307,6 +303,25 @@
 }
 
 /* Pastilles sangles */
+.bagxpro-form-required-note {
+	display: flex;
+	align-items: baseline;
+	gap: 0.35em;
+	margin: 0 0 20px;
+	font-size: 13px;
+	line-height: 1.4;
+}
+
+.bagxpro-form-required-note__text {
+	color: #9ca3af;
+	font-weight: 400;
+}
+
+.bagxpro-field__req {
+	color: #c2410c;
+	font-weight: 700;
+}
+
 .bagxpro-field {
 	margin-bottom: 12px;
 }
@@ -661,6 +676,9 @@
 	background: var(--bagxpro-sim-gold);
 	color: #fff;
 	font-family: inherit;
+	font-size: 14px;
+	text-transform: uppercase;
+	font-weight: 700;
 	cursor: pointer;
 	box-shadow: 0 4px 14px rgba(234, 185, 51, 0.4);
 	transition: background 0.2s, transform 0.15s;

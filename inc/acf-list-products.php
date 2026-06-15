@@ -90,3 +90,32 @@ function bagxpro_register_acf_list_products() {
 		)
 	);
 }
+
+/**
+ * Produit marqué best seller (ACF true_false product_bestseller).
+ *
+ * @param int $post_id ID du CPT produit.
+ * @return bool
+ */
+function bagxpro_is_product_bestseller( $post_id = 0 ) {
+	$post_id = (int) ( $post_id ? $post_id : get_the_ID() );
+	if ( $post_id < 1 || ! function_exists( 'get_field' ) ) {
+		return false;
+	}
+	return (bool) get_field( 'product_bestseller', $post_id );
+}
+
+/**
+ * Badge « Best seller » sur la carte produit.
+ *
+ * @param int $post_id ID du CPT produit.
+ */
+function bagxpro_render_product_bestseller_tag( $post_id = 0 ) {
+	if ( ! bagxpro_is_product_bestseller( $post_id ) ) {
+		return;
+	}
+	printf(
+		'<span class="bagxpro-bestseller-tag">%s</span>',
+		esc_html__( 'Best seller', 'bagxpro' )
+	);
+}

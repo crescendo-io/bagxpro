@@ -19,23 +19,24 @@ $privacy_url = function_exists( 'get_privacy_policy_url' ) ? get_privacy_policy_
 	<p id="impactexpo-lead-feedback" class="impactexpo-lead-feedback" role="alert" hidden></p>
 
 	<div id="impactexpo-lead-body" class="impactexpo-lead-body">
+	<p class="impactexpo-form-required-note"><span class="impactexpo-field__req" aria-hidden="true">*</span> <span class="impactexpo-form-required-note__text"><?php esc_html_e( 'Champs obligatoires', 'impactexpo' ); ?></span></p>
 	<label class="impactexpo-field">
-		<span class="impactexpo-label">Nom de la société <abbr title="obligatoire">*</abbr></span>
+		<span class="impactexpo-label">Nom de la société <span class="impactexpo-field__req" aria-hidden="true">*</span></span>
 		<input type="text" name="company_name" required autocomplete="organization" maxlength="120" minlength="2">
 	</label>
 
 	<label class="impactexpo-field">
-		<span class="impactexpo-label">Adresse complète de votre société <abbr title="obligatoire">*</abbr></span>
+		<span class="impactexpo-label">Adresse complète de votre société <span class="impactexpo-field__req" aria-hidden="true">*</span></span>
 		<input type="text" name="company_address" required autocomplete="street-address" maxlength="250" minlength="5">
 	</label>
 
 	<label class="impactexpo-field">
-		<span class="impactexpo-label">Code postal de votre société <abbr title="obligatoire">*</abbr></span>
+		<span class="impactexpo-label">Code postal de votre société <span class="impactexpo-field__req" aria-hidden="true">*</span></span>
 		<input type="text" name="company_zip" required autocomplete="postal-code" inputmode="numeric" pattern="[0-9]{5}" minlength="5" maxlength="5" title="<?php echo esc_attr__( '5 chiffres, sans espace', 'impactexpo' ); ?>">
 	</label>
 
 	<label class="impactexpo-field">
-		<span class="impactexpo-label">Ville de votre société <abbr title="obligatoire">*</abbr></span>
+		<span class="impactexpo-label">Ville de votre société <span class="impactexpo-field__req" aria-hidden="true">*</span></span>
 		<input type="text" name="company_city" required autocomplete="address-level2" maxlength="100" minlength="2">
 	</label>
 
@@ -60,22 +61,22 @@ $privacy_url = function_exists( 'get_privacy_policy_url' ) ? get_privacy_policy_
 	</div>
 
 	<label class="impactexpo-field">
-		<span class="impactexpo-label">Votre prénom <abbr title="obligatoire">*</abbr></span>
+		<span class="impactexpo-label">Votre prénom <span class="impactexpo-field__req" aria-hidden="true">*</span></span>
 		<input type="text" name="first_name" required autocomplete="given-name" maxlength="80" minlength="2">
 	</label>
 
 	<label class="impactexpo-field">
-		<span class="impactexpo-label">Votre nom <abbr title="obligatoire">*</abbr></span>
+		<span class="impactexpo-label">Votre nom <span class="impactexpo-field__req" aria-hidden="true">*</span></span>
 		<input type="text" name="last_name" required autocomplete="family-name" maxlength="80" minlength="2">
 	</label>
 
 	<label class="impactexpo-field">
-		<span class="impactexpo-label">Votre e-mail <abbr title="obligatoire">*</abbr></span>
+		<span class="impactexpo-label">Votre e-mail <span class="impactexpo-field__req" aria-hidden="true">*</span></span>
 		<input type="email" name="email" required autocomplete="email" maxlength="100">
 	</label>
 
 	<label class="impactexpo-field">
-		<span class="impactexpo-label">Numéro de portable <abbr title="obligatoire">*</abbr></span>
+		<span class="impactexpo-label">Numéro de portable <span class="impactexpo-field__req" aria-hidden="true">*</span></span>
 		<input type="tel" name="mobile" required autocomplete="tel" maxlength="20" placeholder="<?php echo esc_attr__( 'Ex. 06 12 34 56 78', 'impactexpo' ); ?>">
 	</label>
 
@@ -110,7 +111,7 @@ $privacy_url = function_exists( 'get_privacy_policy_url' ) ? get_privacy_policy_
 			<?php else : ?>
 				J’accepte que mes données personnelles soient utilisées pour répondre à ma demande de contact / devis.
 			<?php endif; ?>
-			<abbr title="obligatoire">*</abbr>
+			<span class="impactexpo-field__req" aria-hidden="true">*</span>
 		</span>
 	</label>
 

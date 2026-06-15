@@ -753,7 +753,7 @@ function bagxpro_handle_produit_form_submit() {
 		}
 	}
 
-	if ( '' === $societe || '' === $nom || '' === $prenom || ! is_email( $email ) || '' === $tier_key || '' === $print_faces ) {
+	if ( '' === $societe || '' === $nom || '' === $prenom || ! is_email( $email ) || '' === trim( $telephone ) || '' === $tier_key || '' === $print_faces ) {
 		wp_safe_redirect( add_query_arg( 'commande', 'incomplet', get_permalink( $product_id ) ) );
 		exit;
 	}

@@ -217,7 +217,14 @@ $bagxpro_stat_to_int = static function ( $raw ) {
 			<img src="<?php echo esc_url( $bagxpro_hero_bag_url ); ?>" class="bag-img" alt="">
 		<?php endif; ?>
 		<?php if ( $bagxpro_hero_ph_url ) : ?>
-			<img src="<?php echo esc_url( $bagxpro_hero_ph_url ); ?>" class="placeholder" alt="">
+			<img
+				src="<?php echo esc_url( $bagxpro_hero_ph_url ); ?>"
+				class="placeholder bagxpro-hero-placeholder-trigger"
+				alt=""
+				role="button"
+				tabindex="0"
+				aria-label="<?php echo esc_attr__( 'Ouvrir le configurateur', 'bagxpro' ); ?>"
+			>
 		<?php endif; ?>
 	</div>
 </div>
