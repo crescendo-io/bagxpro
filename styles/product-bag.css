@@ -738,7 +738,7 @@
 	object-fit: contain;
 	mix-blend-mode: multiply;
 	opacity: 0.78;
-	filter: contrast(0.88) brightness(1.14) saturate(0.92);
+	filter: contrast(0.7) brightness(1.14) saturate(0.92);
 }
 
 .bagxpro-produit-panel__content {
