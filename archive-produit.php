@@ -37,11 +37,11 @@ get_header();
 						<div class="card-info__content">
 							<h3>Résistance professionnelle</h3>
 							<p>Les Big Bags sont conçus pour résister aux conditions les plus difficiles :</p>
-							<ul>
-								<li>- Traitement UV</li>
-								<li>- Charge maximale utilisation (CMU/ SWL )  2000kg</li>
-								<li>- coutures renforcée</li>
-								<li>- Tissu PP haute densité Gsm jusqu’à 210g/m2</li>
+							<ul class="list-unstyled">
+								<li>Traitement UV</li>
+								<li>Charge maximale utilisation (CMU/ SWL )  2000kg</li>
+								<li>coutures renforcées</li>
+								<li>Tissu PP haute densité Gsm jusqu’à 210g/m2</li>
 							</ul>
 						</div>
 					</div>
@@ -63,9 +63,9 @@ get_header();
 						<div class="card-info__content">
 							<h3>Conforme aux normes</h3>
 							<p>Nos Bigs Bags (FIBC GRVS) sont conformes aux normes Européennes : </p>
-								<ul>
-									<li>- Coefficient sécurité  5:1</li>
-									<li>- Iso 21898</li>
+								<ul class="list-unstyled">
+									<li>Coefficient sécurité  5:1</li>
+									<li>Iso 21898</li>
 								</ul>
 						</div>
 					</div>
