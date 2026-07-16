@@ -1130,6 +1130,51 @@ body.bagxpro-loader-done .strate-hero.home .container-bag-home .placeholder {
 }
 
 
+.cky-btn-accept {
+    background: #EAB933 !important;
+    border: 2px solid #EAB933 !important;
+    border-radius: 30px !important;
+}
+
+.cky-consent-container .cky-consent-bar{
+    background: #000 !important;
+    border: 0 !important;
+}
+
+.cky-notice .cky-title{
+    color: #FFF !important;
+}
+
+.cky-consent-bar .cky-notice-des p, .cky-gpc-wrapper .cky-gpc-desc p, .cky-preference-body-wrapper .cky-preference-content-wrapper p, .cky-accordion-header-wrapper .cky-accordion-header-des p, .cky-cookie-des-table li div:last-child p{
+    color: #000 !important;
+}
+
+.cky-btn-reject,
+.cky-btn-customize,
+.cky-btn-preferences{
+    color: #000 !important;
+    border-color: #EAB933!important;
+    border-radius: 30px !important;
+}
+
+.cky-preference-content-wrapper, .cky-accordion-wrapper, .cky-accordion, .cky-accordion-wrapper, .cky-footer-wrapper, .cky-prefrence-btn-wrapper .strate-presentation{
+    padding: 10px 0 !important;
+}
+
+button.cky-accordion-btn{
+    text-align: left !important;
+}
+
+.cky-prefrence-btn-wrapper .cky-btn{
+    margin-bottom: 10px !important;
+}
+
+.cky-btn-revisit-wrapper{
+    background: #EAB933 !important;
+}
+
+.cky-preference-header, .cky-preference-body-wrapper, .cky-preference-content-wrapper, .cky-accordion-wrapper, .cky-accordion, .cky-accordion-wrapper, .cky-footer-wrapper, .cky-prefrence-btn-wrapper
+
 .strate-presentation{
     padding: 40px 0;
     .container-white{
