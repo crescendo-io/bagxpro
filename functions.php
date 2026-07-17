@@ -34,17 +34,20 @@ function bagxpro_theme_support() {
 }
 
 /**
- * Désactive les archives auteur (/author/…) : redirection 301 vers l’accueil.
+ * Désactive les archives inutiles (auteur, catégorie, tag, date) : redirection 301 vers l’accueil.
  */
-add_action( 'template_redirect', 'bagxpro_disable_author_archives' );
-function bagxpro_disable_author_archives() {
-	if ( is_author() ) {
+add_action( 'template_redirect', 'bagxpro_disable_unused_archives' );
+function bagxpro_disable_unused_archives() {
+	if ( is_author() || is_category() || is_tag() || is_date() ) {
 		wp_safe_redirect( home_url( '/' ), 301 );
 		exit;
 	}
 }
 
 add_filter( 'author_rewrite_rules', '__return_empty_array' );
+add_filter( 'category_rewrite_rules', '__return_empty_array' );
+add_filter( 'tag_rewrite_rules', '__return_empty_array' );
+add_filter( 'date_rewrite_rules', '__return_empty_array' );
 
 add_action( 'init', 'bagxpro_register_commande_post_type', 9 );
 function bagxpro_register_commande_post_type() {
