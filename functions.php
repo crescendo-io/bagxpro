@@ -219,8 +219,20 @@ add_action( 'wp_head', 'add_self_canonical_tag' );
 add_action( 'wp_enqueue_scripts', 'wpm_enqueue_styles' );
 function wpm_enqueue_styles(){
     //wp_enqueue_style( 'parent-style', get_template_directory_uri() . '/styles/theme.css' );
-    wp_enqueue_style('lightbox', get_stylesheet_directory_uri() . '/styles/lightbox.css', array(), filemtime(get_template_directory() . '/styles/theme.css'));
-    wp_enqueue_style('theme', get_stylesheet_directory_uri() . '/styles/theme.css', array(), filemtime(get_template_directory() . '/styles/theme.css'));
+	$theme_css = get_stylesheet_directory() . '/styles/theme.css';
+	$lightbox_css = get_stylesheet_directory() . '/styles/lightbox.css';
+    wp_enqueue_style(
+		'lightbox',
+		get_stylesheet_directory_uri() . '/styles/lightbox.css',
+		array(),
+		file_exists( $lightbox_css ) ? filemtime( $lightbox_css ) : null
+	);
+    wp_enqueue_style(
+		'theme',
+		get_stylesheet_directory_uri() . '/styles/theme.css',
+		array(),
+		file_exists( $theme_css ) ? filemtime( $theme_css ) : null
+	);
     $responsive_css = get_stylesheet_directory() . '/styles/responsive.css';
     wp_enqueue_style(
         'bagxpro-responsive',
@@ -348,6 +360,45 @@ function wpm_enqueue_styles(){
 			true
 		);
 	}
+}
+
+/**
+ * CSS non critique en chargement asynchrone (media=print → all).
+ * theme.css reste bloquant (loader + styles above-the-fold).
+ */
+add_filter( 'style_loader_tag', 'bagxpro_async_noncritical_styles', 10, 4 );
+function bagxpro_async_noncritical_styles( $html, $handle, $href, $media ) {
+	$async_handles = array( 'style_principal', 'lightbox', 'bagxpro-responsive' );
+	if ( ! in_array( $handle, $async_handles, true ) ) {
+		return $html;
+	}
+
+	$async_html = preg_replace(
+		"/media=['\"]all['\"]/",
+		'media="print" onload="this.media=\'all\'"',
+		$html,
+		1
+	);
+
+	if ( ! is_string( $async_html ) || $async_html === $html ) {
+		return $html;
+	}
+
+	return $async_html . '<noscript>' . $html . '</noscript>';
+}
+
+/**
+ * CookieYes (script.min.js) : defer pour ne plus bloquer le rendu.
+ */
+add_filter( 'script_loader_tag', 'bagxpro_defer_cookie_script', 10, 3 );
+function bagxpro_defer_cookie_script( $tag, $handle, $src ) {
+	if ( 'cookie-law-info' !== $handle ) {
+		return $tag;
+	}
+	if ( false !== strpos( $tag, ' defer' ) || false !== strpos( $tag, ' async' ) ) {
+		return $tag;
+	}
+	return str_replace( ' src', ' defer src', $tag );
 }
 
 
